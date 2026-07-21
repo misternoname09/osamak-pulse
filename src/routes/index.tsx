@@ -6,8 +6,8 @@ export const Route = createFileRoute("/")({
     meta: [
       { title: "OSAMAK — Urgences transfusionnelles au Sénégal" },
       { name: "description", content: "Trouvez un donneur de sang compatible en quelques minutes. Solution numérique vitale pour les urgences transfusionnelles au Sénégal." },
-      { property: "og:title", content: "OSAMAK — Sauver des vies, plus vite" },
-      { property: "og:description", content: "Mise en relation rapide entre patients et donneurs compatibles au Sénégal." },
+      { property: "og:title", content: "OSAMAK — Urgences transfusionnelles au Sénégal" },
+      { property: "og:description", content: "Trouvez un donneur de sang compatible en quelques minutes. Solution numérique vitale pour les urgences transfusionnelles au Sénégal." },
     ],
   }),
   component: HomePage,
