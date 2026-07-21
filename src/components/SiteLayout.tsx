@@ -1,7 +1,7 @@
-import { Link, Outlet } from "@tanstack/react-router";
-import { useState } from "react";
+import { Link } from "@tanstack/react-router";
+import { useState, type ReactNode } from "react";
 
-export function SiteLayout() {
+export function SiteLayout({ children }: { children: ReactNode }) {
   const [open, setOpen] = useState(false);
   const navLink =
     "px-3 py-2 text-sm font-medium text-foreground/80 hover:text-primary transition-colors";
