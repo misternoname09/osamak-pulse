@@ -18,6 +18,7 @@ export function SiteLayout({ children }: { children: ReactNode }) {
           <nav className="hidden md:flex items-center gap-1">
             <Link to="/" className={navLink} activeProps={{ className: activeCls }} activeOptions={{ exact: true }}>Accueil</Link>
             <Link to="/disponibilite" className={navLink} activeProps={{ className: activeCls }}>Disponibilité sang</Link>
+            <Link to="/assistant" className={navLink} activeProps={{ className: activeCls }}>Assistant IA</Link>
             <Link to="/contact" className={navLink} activeProps={{ className: activeCls }}>Contact</Link>
           </nav>
           <button
@@ -33,6 +34,7 @@ export function SiteLayout({ children }: { children: ReactNode }) {
             <div className="px-4 py-2 flex flex-col">
               <Link to="/" className={navLink} onClick={() => setOpen(false)} activeProps={{ className: activeCls }} activeOptions={{ exact: true }}>Accueil</Link>
               <Link to="/disponibilite" className={navLink} onClick={() => setOpen(false)} activeProps={{ className: activeCls }}>Disponibilité sang</Link>
+              <Link to="/assistant" className={navLink} onClick={() => setOpen(false)} activeProps={{ className: activeCls }}>Assistant IA</Link>
               <Link to="/contact" className={navLink} onClick={() => setOpen(false)} activeProps={{ className: activeCls }}>Contact</Link>
             </div>
           </div>
