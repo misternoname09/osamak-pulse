@@ -30,12 +30,23 @@ function DifyAgent() {
   const [result, setResult] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [validationError, setValidationError] = useState<string | null>(null);
+
+  const handleChange = (value: string) => {
+    setQuery(value);
+    if (value.trim()) setValidationError(null);
+  };
 
   const ask = async (e: FormEvent) => {
     e.preventDefault();
-    if (!query.trim() || loading) return;
+    if (loading) return;
+    if (!query.trim()) {
+      setValidationError("Veuillez saisir une question avant d’interroger l’agent IA.");
+      return;
+    }
     setLoading(true);
     setError(null);
+    setValidationError(null);
     setResult(null);
 
     const controller = new AbortController();
@@ -98,16 +109,25 @@ function DifyAgent() {
           <textarea
             id="dify-query"
             value={query}
-            onChange={(e) => setQuery(e.target.value)}
+            onChange={(e) => handleChange(e.target.value)}
             rows={3}
             placeholder="question que repondre l'application"
-            className="w-full resize-none rounded-xl border border-border bg-background px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary/40"
+            aria-invalid={!!validationError}
+            aria-describedby={validationError ? "dify-error" : undefined}
+            className={`w-full resize-none rounded-xl border bg-background px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary/40 ${
+              validationError ? "border-destructive" : "border-border"
+            }`}
             disabled={loading}
           />
+          {validationError && (
+            <p id="dify-error" className="mt-2 text-sm text-destructive" role="alert">
+              {validationError}
+            </p>
+          )}
           <div className="mt-3 flex justify-end">
             <button
               type="submit"
-              disabled={loading || !query.trim()}
+              disabled={loading}
               className="inline-flex items-center gap-2 rounded-xl bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground disabled:opacity-50 hover:bg-primary/90 transition"
             >
               {loading && (
