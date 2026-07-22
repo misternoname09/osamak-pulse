@@ -1,4 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { useState, type FormEvent } from "react";
 import { SiteLayout } from "@/components/SiteLayout";
 
 export const Route = createFileRoute("/")({
@@ -19,7 +20,124 @@ function HomePage() {
       <Hero />
       <Stats />
       <HowItWorks />
+      <DifyAgent />
     </SiteLayout>
+  );
+}
+
+function DifyAgent() {
+  const [query, setQuery] = useState("");
+  const [result, setResult] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const ask = async (e: FormEvent) => {
+    e.preventDefault();
+    if (!query.trim() || loading) return;
+    setLoading(true);
+    setError(null);
+    setResult(null);
+
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 10000);
+    let timedOut = false;
+    const timeoutFlag = setTimeout(() => { timedOut = true; }, 10000);
+
+    try {
+      const res = await fetch("https://api.dify.ai/v1/workflows/run", {
+        method: "POST",
+        headers: {
+          Authorization: "Bearer app-LGSZmJYt4J79PsGRtVQA344y",
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          inputs: { query },
+          response_mode: "blocking",
+          user: "OSAMAK-" + Date.now(),
+        }),
+        signal: controller.signal,
+      });
+      clearTimeout(timeout);
+      clearTimeout(timeoutFlag);
+      if (!res.ok) throw new Error("http");
+      const data = await res.json();
+      const outputs = data?.data?.outputs;
+      const text =
+        typeof outputs === "string"
+          ? outputs
+          : outputs?.text ?? outputs?.answer ?? JSON.stringify(outputs, null, 2);
+      setResult(text ?? "Aucune réponse reçue.");
+    } catch {
+      clearTimeout(timeout);
+      clearTimeout(timeoutFlag);
+      if (timedOut || controller.signal.aborted) {
+        setError("La réponse prend trop de temps — réessayez");
+      } else {
+        setError("Service temporairement indisponible");
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <section className="py-16 md:py-20 bg-secondary/40">
+      <div className="mx-auto max-w-3xl px-4">
+        <div className="text-center">
+          <span className="inline-flex items-center gap-2 rounded-full bg-primary/10 text-primary px-3 py-1 text-xs font-semibold">
+            <span>🤖</span> Agent IA OSAMAK
+          </span>
+          <h2 className="mt-3 text-2xl md:text-3xl font-bold">Consultez l'agent IA</h2>
+          <p className="mt-2 text-muted-foreground text-sm">
+            Posez une question sur OSAMAK et obtenez une réponse instantanée.
+          </p>
+        </div>
+
+        <form onSubmit={ask} className="mt-8 rounded-2xl bg-card border border-border p-5 shadow-sm">
+          <label htmlFor="dify-query" className="sr-only">Votre question</label>
+          <textarea
+            id="dify-query"
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            rows={3}
+            placeholder="question que repondre l'application"
+            className="w-full resize-none rounded-xl border border-border bg-background px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary/40"
+            disabled={loading}
+          />
+          <div className="mt-3 flex justify-end">
+            <button
+              type="submit"
+              disabled={loading || !query.trim()}
+              className="inline-flex items-center gap-2 rounded-xl bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground disabled:opacity-50 hover:bg-primary/90 transition"
+            >
+              {loading && (
+                <span className="inline-block w-4 h-4 border-2 border-primary-foreground/40 border-t-primary-foreground rounded-full animate-spin" />
+              )}
+              tu te base sur le projet
+            </button>
+          </div>
+        </form>
+
+        {loading && (
+          <div className="mt-5 flex items-center justify-center gap-3 text-sm text-muted-foreground">
+            <span className="inline-block w-5 h-5 border-2 border-primary/30 border-t-primary rounded-full animate-spin" />
+            Consultation de l'agent IA…
+          </div>
+        )}
+
+        {error && (
+          <div className="mt-5 rounded-xl border border-destructive/30 bg-destructive/10 text-destructive px-4 py-3 text-sm" role="alert">
+            {error}
+          </div>
+        )}
+
+        {result && !loading && (
+          <div className="mt-5 rounded-xl bg-muted border border-border px-4 py-4 text-sm whitespace-pre-wrap leading-relaxed text-foreground">
+            {result}
+          </div>
+        )}
+      </div>
+    </section>
   );
 }
 
