@@ -19,6 +19,7 @@ export function SiteLayout({ children }: { children: ReactNode }) {
             <Link to="/" className={navLink} activeProps={{ className: activeCls }} activeOptions={{ exact: true }}>Accueil</Link>
             <Link to="/disponibilite" className={navLink} activeProps={{ className: activeCls }}>Disponibilité sang</Link>
             <Link to="/assistant" className={navLink} activeProps={{ className: activeCls }}>Assistant IA</Link>
+            <Link to="/saisie-donnees" className={navLink} activeProps={{ className: activeCls }}>Saisie terrain</Link>
             <Link to="/contact" className={navLink} activeProps={{ className: activeCls }}>Contact</Link>
           </nav>
           <button
