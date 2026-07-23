@@ -9,6 +9,7 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as SaisieDonneesRouteImport } from './routes/saisie-donnees'
 import { Route as McpRouteImport } from './routes/mcp'
 import { Route as DisponibiliteRouteImport } from './routes/disponibilite'
 import { Route as ContactRouteImport } from './routes/contact'
@@ -19,6 +20,11 @@ import { Route as Char91DotwellKnownChar93OauthProtectedResourceRouteImport } fr
 import { Route as Char91DotmcpChar93ListToolsRouteImport } from './routes/[.mcp]/list-tools'
 import { Route as Char91DotmcpChar93InvokeToolToolRouteImport } from './routes/[.mcp]/invoke-tool/$tool'
 
+const SaisieDonneesRoute = SaisieDonneesRouteImport.update({
+  id: '/saisie-donnees',
+  path: '/saisie-donnees',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const McpRoute = McpRouteImport.update({
   id: '/mcp',
   path: '/mcp',
@@ -74,6 +80,7 @@ export interface FileRoutesByFullPath {
   '/contact': typeof ContactRoute
   '/disponibilite': typeof DisponibiliteRoute
   '/mcp': typeof McpRoute
+  '/saisie-donnees': typeof SaisieDonneesRoute
   '/.mcp/list-tools': typeof Char91DotmcpChar93ListToolsRoute
   '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   '/api/chat': typeof ApiChatRoute
@@ -85,6 +92,7 @@ export interface FileRoutesByTo {
   '/contact': typeof ContactRoute
   '/disponibilite': typeof DisponibiliteRoute
   '/mcp': typeof McpRoute
+  '/saisie-donnees': typeof SaisieDonneesRoute
   '/.mcp/list-tools': typeof Char91DotmcpChar93ListToolsRoute
   '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   '/api/chat': typeof ApiChatRoute
@@ -97,6 +105,7 @@ export interface FileRoutesById {
   '/contact': typeof ContactRoute
   '/disponibilite': typeof DisponibiliteRoute
   '/mcp': typeof McpRoute
+  '/saisie-donnees': typeof SaisieDonneesRoute
   '/.mcp/list-tools': typeof Char91DotmcpChar93ListToolsRoute
   '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   '/api/chat': typeof ApiChatRoute
@@ -110,6 +119,7 @@ export interface FileRouteTypes {
     | '/contact'
     | '/disponibilite'
     | '/mcp'
+    | '/saisie-donnees'
     | '/.mcp/list-tools'
     | '/.well-known/oauth-protected-resource'
     | '/api/chat'
@@ -121,6 +131,7 @@ export interface FileRouteTypes {
     | '/contact'
     | '/disponibilite'
     | '/mcp'
+    | '/saisie-donnees'
     | '/.mcp/list-tools'
     | '/.well-known/oauth-protected-resource'
     | '/api/chat'
@@ -132,6 +143,7 @@ export interface FileRouteTypes {
     | '/contact'
     | '/disponibilite'
     | '/mcp'
+    | '/saisie-donnees'
     | '/.mcp/list-tools'
     | '/.well-known/oauth-protected-resource'
     | '/api/chat'
@@ -144,6 +156,7 @@ export interface RootRouteChildren {
   ContactRoute: typeof ContactRoute
   DisponibiliteRoute: typeof DisponibiliteRoute
   McpRoute: typeof McpRoute
+  SaisieDonneesRoute: typeof SaisieDonneesRoute
   Char91DotmcpChar93ListToolsRoute: typeof Char91DotmcpChar93ListToolsRoute
   Char91DotwellKnownChar93OauthProtectedResourceRoute: typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   ApiChatRoute: typeof ApiChatRoute
@@ -152,6 +165,13 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/saisie-donnees': {
+      id: '/saisie-donnees'
+      path: '/saisie-donnees'
+      fullPath: '/saisie-donnees'
+      preLoaderRoute: typeof SaisieDonneesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/mcp': {
       id: '/mcp'
       path: '/mcp'
@@ -224,6 +244,7 @@ const rootRouteChildren: RootRouteChildren = {
   ContactRoute: ContactRoute,
   DisponibiliteRoute: DisponibiliteRoute,
   McpRoute: McpRoute,
+  SaisieDonneesRoute: SaisieDonneesRoute,
   Char91DotmcpChar93ListToolsRoute: Char91DotmcpChar93ListToolsRoute,
   Char91DotwellKnownChar93OauthProtectedResourceRoute:
     Char91DotwellKnownChar93OauthProtectedResourceRoute,
