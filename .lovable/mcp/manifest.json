@@ -1,0 +1,98 @@
+{
+  "version": 1,
+  "sdk_version": "0.24.0",
+  "path": "/mcp",
+  "auth": {
+    "type": "none"
+  },
+  "mcp": {
+    "server": {
+      "name": "osamak-mcp",
+      "version": "0.1.0",
+      "title": "OSAMAK MCP"
+    },
+    "tools": [
+      {
+        "name": "list_blood_availability",
+        "title": "List blood availability",
+        "description": "List current blood availability across OSAMAK partner centers in Senegal (CNTS Dakar, Hôpital Principal, Fann, Thiès, Saint-Louis, Kaolack). Optionally filter by blood group.",
+        "annotations": {
+          "readOnlyHint": true,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "$schema": "http://json-schema.org/draft-07/schema#",
+          "type": "object",
+          "properties": {
+            "group": {
+              "description": "Optional blood group filter.",
+              "type": "string",
+              "enum": [
+                "O+",
+                "O-",
+                "A+",
+                "A-",
+                "B+",
+                "B-",
+                "AB+",
+                "AB-"
+              ]
+            }
+          }
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "blood_compatibility",
+        "title": "Blood compatibility",
+        "description": "Return ABO/Rh donor-recipient compatibility for a blood group: who they can receive from and who they can donate to.",
+        "annotations": {
+          "readOnlyHint": true,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "$schema": "http://json-schema.org/draft-07/schema#",
+          "type": "object",
+          "properties": {
+            "group": {
+              "type": "string",
+              "enum": [
+                "O+",
+                "O-",
+                "A+",
+                "A-",
+                "B+",
+                "B-",
+                "AB+",
+                "AB-"
+              ],
+              "description": "Blood group, e.g. O+, A-, AB+."
+            }
+          },
+          "required": [
+            "group"
+          ]
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "get_contact_info",
+        "title": "Get OSAMAK contact info",
+        "description": "Return the public contact information for OSAMAK and the Centre National de Transfusion Sanguine (CNTS) in Dakar, Senegal.",
+        "annotations": {
+          "readOnlyHint": true,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "$schema": "http://json-schema.org/draft-07/schema#",
+          "type": "object",
+          "properties": {}
+        },
+        "outputSchema": null
+      }
+    ]
+  }
+}
