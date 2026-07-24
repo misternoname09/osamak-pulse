@@ -182,9 +182,12 @@ function Hero() {
             Une solution numérique vitale pour les urgences transfusionnelles au Sénégal.
           </p>
           <div className="mt-8 flex flex-wrap gap-3">
-            <button className="inline-flex items-center justify-center rounded-md bg-primary text-primary-foreground px-6 py-3 text-sm font-semibold shadow-lg shadow-primary/25 hover:bg-primary/90 transition">
+            <Link
+              to="/inscription-donneur"
+              className="inline-flex items-center justify-center rounded-md bg-primary text-primary-foreground px-6 py-3 text-sm font-semibold shadow-lg shadow-primary/25 hover:bg-primary/90 transition"
+            >
               S'inscrire comme donneur
-            </button>
+            </Link>
             <Link
               to="/contact"
               className="inline-flex items-center justify-center rounded-md bg-accent text-accent-foreground px-6 py-3 text-sm font-semibold hover:bg-accent/90 transition"
@@ -192,6 +195,7 @@ function Hero() {
               Signaler une urgence
             </Link>
           </div>
+
         </div>
         <div className="relative">
           <div className="aspect-square max-w-md mx-auto rounded-3xl bg-gradient-to-br from-primary to-accent p-1 shadow-2xl">
