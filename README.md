@@ -1,4 +1,14 @@
 # Welcome to your Lovable project
+#Fiche d'équipe
+Nom de l'équipe : OSAMAK 
+Prénom et rôle de chaque membre :
+Abdoulaye FAYE : Chef de Produit
+Mouhamed Mansour Sarr Nam : Responsible Impact
+Cheikh Ahmadou Bamba Diop : Dev UI
+Mame Cheikh Ibrahima Khalil SOW : Administrateur Base de Donnée
+Samba Sow: Master Prompt Engineer 
+Ousseynou Diop : Developpeur Web
+
 
 This project was built with [Lovable](https://lovable.dev).
 
