@@ -55,7 +55,7 @@ function DifyAgent() {
     const timeoutFlag = setTimeout(() => { timedOut = true; }, 10000);
 
     try {
-      const res = await fetch("https://api.dify.ai/v1/workflows/run", {
+      const res = await fetch("https://api.dify.ai/v1/chat-messages", {
         method: "POST",
         headers: {
           Authorization: "Bearer app-LGSZmJYt4J79PsGRtVQA344y",
@@ -63,6 +63,7 @@ function DifyAgent() {
         },
         body: JSON.stringify({
           inputs: { query },
+          query,
           response_mode: "blocking",
           user: "OSAMAK-" + Date.now(),
         }),
@@ -70,15 +71,19 @@ function DifyAgent() {
       });
       clearTimeout(timeout);
       clearTimeout(timeoutFlag);
-      if (!res.ok) throw new Error("http");
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        throw new Error(err.message || "http");
+      }
       const data = await res.json();
-      const outputs = data?.data?.outputs;
       const text =
-        typeof outputs === "string"
-          ? outputs
-          : outputs?.text ?? outputs?.answer ?? JSON.stringify(outputs, null, 2);
-      setResult(text ?? "Aucune réponse reçue.");
-    } catch {
+        typeof data?.answer === "string"
+          ? data.answer
+          : typeof data?.data?.outputs === "string"
+          ? data.data.outputs
+          : data?.data?.outputs?.text ?? data?.data?.outputs?.answer ?? "Aucune réponse reçue.";
+      setResult(text);
+    } catch (err) {
       clearTimeout(timeout);
       clearTimeout(timeoutFlag);
       if (timedOut || controller.signal.aborted) {

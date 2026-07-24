@@ -32,7 +32,7 @@ function SaisieDonneesPage() {
     setResult(null);
 
     try {
-      const res = await fetch("https://api.dify.ai/v1/workflows/run", {
+      const res = await fetch("https://api.dify.ai/v1/chat-messages", {
         method: "POST",
         headers: {
           Authorization: "Bearer app-LGSZmJYt4J79PsGRtVQA344y",
@@ -43,6 +43,7 @@ function SaisieDonneesPage() {
             query: question,
             donnees_sante: donneesSante,
           },
+          query: question,
           response_mode: "blocking",
           user: "agent-sante",
         }),
@@ -51,7 +52,10 @@ function SaisieDonneesPage() {
       if (!res.ok) throw new Error("http");
 
       const data = await res.json();
-      const text = data?.data?.outputs?.text;
+      const text =
+        typeof data?.answer === "string"
+          ? data.answer
+          : data?.data?.outputs?.text ?? "Aucune réponse reçue.";
       setResult(typeof text === "string" ? text : "Aucune réponse reçue.");
     } catch {
       setError("❌ Erreur — réessayer");
