@@ -92,6 +92,12 @@ function InscriptionDonneurPage() {
             <p className="mt-3 text-muted-foreground">
               Rejoignez le réseau OSAMAK et recevez une alerte quand votre groupe sanguin est nécessaire près de chez vous.
             </p>
+            <div className="mt-4">
+              <Link to="/eligibilite" className="inline-flex items-center text-sm font-semibold text-accent hover:underline">
+                🧪 Faire le test d'éligibilité avant de s'inscrire
+              </Link>
+            </div>
+
           </div>
 
           {submitted ? (
