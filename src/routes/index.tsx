@@ -55,7 +55,7 @@ function DifyAgent() {
     const timeoutFlag = setTimeout(() => { timedOut = true; }, 10000);
 
     try {
-      const res = await fetch("https://api.dify.ai/v1/chat-messages", {
+      const res = await fetch("https://api.dify.ai/v1/workflows/run", {
         method: "POST",
         headers: {
           Authorization: "Bearer app-LGSZmJYt4J79PsGRtVQA344y",
@@ -63,7 +63,6 @@ function DifyAgent() {
         },
         body: JSON.stringify({
           inputs: { query },
-          query,
           response_mode: "blocking",
           user: "OSAMAK-" + Date.now(),
         }),
