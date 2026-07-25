@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { SiteLayout } from "@/components/SiteLayout";
+import { BloodCentersMap } from "@/components/BloodCentersMap";
 
 export const Route = createFileRoute("/disponibilite")({
   head: () => ({
@@ -114,6 +115,14 @@ function DisponibilitePage() {
         {items.length === 0 && (
           <p className="mt-8 text-center text-muted-foreground">Aucun résultat pour ce filtre.</p>
         )}
+
+        <div className="mt-16">
+          <h2 className="text-2xl font-bold tracking-tight">Carte des centres de don</h2>
+          <p className="mt-2 text-muted-foreground">
+            Visualisez les centres de don de sang à Dakar et leurs disponibilités.
+          </p>
+          <BloodCentersMap />
+        </div>
       </section>
     </SiteLayout>
   );
