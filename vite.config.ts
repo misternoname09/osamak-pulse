@@ -14,6 +14,8 @@ export default defineConfig({
     server: { entry: "server" },
   },
   vite: {
-    plugins: [mcpPlugin()],
+    plugins: [
+      // mcpPlugin() disabled temporarily to fix Windows path resolution error
+    ],
   },
 });

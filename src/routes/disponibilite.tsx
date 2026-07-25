@@ -1,7 +1,27 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useState } from "react";
+import { useState, lazy, Suspense, useEffect } from "react";
 import { SiteLayout } from "@/components/SiteLayout";
-import { BloodCentersMap } from "@/components/BloodCentersMap";
+
+const BloodCentersMap = lazy(() =>
+  import("@/components/BloodCentersMap").then((m) => ({ default: m.BloodCentersMap }))
+);
+
+function MapWrapper() {
+  const [isClient, setIsClient] = useState(false);
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
+
+  if (!isClient) {
+    return <div className="h-[500px] w-full rounded-2xl bg-muted animate-pulse border border-border my-10" />;
+  }
+
+  return (
+    <Suspense fallback={<div className="h-[500px] w-full rounded-2xl bg-muted animate-pulse border border-border my-10" />}>
+      <BloodCentersMap />
+    </Suspense>
+  );
+}
 
 export const Route = createFileRoute("/disponibilite")({
   head: () => ({
@@ -121,7 +141,7 @@ function DisponibilitePage() {
           <p className="mt-2 text-muted-foreground">
             Visualisez les centres de don de sang à Dakar et leurs disponibilités.
           </p>
-          <BloodCentersMap />
+          <MapWrapper />
         </div>
       </section>
     </SiteLayout>

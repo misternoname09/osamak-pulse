@@ -9,47 +9,22 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as SaisieDonneesRouteImport } from './routes/saisie-donnees'
-import { Route as McpRouteImport } from './routes/mcp'
-import { Route as InscriptionDonneurRouteImport } from './routes/inscription-donneur'
-import { Route as EligibiliteRouteImport } from './routes/eligibilite'
-import { Route as DisponibiliteRouteImport } from './routes/disponibilite'
-import { Route as ContactRouteImport } from './routes/contact'
-import { Route as AssistantRouteImport } from './routes/assistant'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as ApiChatRouteImport } from './routes/api/chat'
-import { Route as Char91DotwellKnownChar93OauthProtectedResourceRouteImport } from './routes/[.well-known]/oauth-protected-resource'
+import { Route as AssistantRouteImport } from './routes/assistant'
+import { Route as ContactRouteImport } from './routes/contact'
+import { Route as DisponibiliteRouteImport } from './routes/disponibilite'
+import { Route as EligibiliteRouteImport } from './routes/eligibilite'
+import { Route as InscriptionDonneurRouteImport } from './routes/inscription-donneur'
+import { Route as McpRouteImport } from './routes/mcp'
+import { Route as SaisieDonneesRouteImport } from './routes/saisie-donnees'
 import { Route as Char91DotmcpChar93ListToolsRouteImport } from './routes/[.mcp]/list-tools'
+import { Route as Char91DotwellKnownChar93OauthProtectedResourceRouteImport } from './routes/[.well-known]/oauth-protected-resource'
+import { Route as ApiChatRouteImport } from './routes/api/chat'
 import { Route as Char91DotmcpChar93InvokeToolToolRouteImport } from './routes/[.mcp]/invoke-tool/$tool'
 
-const SaisieDonneesRoute = SaisieDonneesRouteImport.update({
-  id: '/saisie-donnees',
-  path: '/saisie-donnees',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const McpRoute = McpRouteImport.update({
-  id: '/mcp',
-  path: '/mcp',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const InscriptionDonneurRoute = InscriptionDonneurRouteImport.update({
-  id: '/inscription-donneur',
-  path: '/inscription-donneur',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const EligibiliteRoute = EligibiliteRouteImport.update({
-  id: '/eligibilite',
-  path: '/eligibilite',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const DisponibiliteRoute = DisponibiliteRouteImport.update({
-  id: '/disponibilite',
-  path: '/disponibilite',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ContactRoute = ContactRouteImport.update({
-  id: '/contact',
-  path: '/contact',
+const IndexRoute = IndexRouteImport.update({
+  id: '/',
+  path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AssistantRoute = AssistantRouteImport.update({
@@ -57,28 +32,53 @@ const AssistantRoute = AssistantRouteImport.update({
   path: '/assistant',
   getParentRoute: () => rootRouteImport,
 } as any)
-const IndexRoute = IndexRouteImport.update({
-  id: '/',
-  path: '/',
+const ContactRoute = ContactRouteImport.update({
+  id: '/contact',
+  path: '/contact',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ApiChatRoute = ApiChatRouteImport.update({
-  id: '/api/chat',
-  path: '/api/chat',
+const DisponibiliteRoute = DisponibiliteRouteImport.update({
+  id: '/disponibilite',
+  path: '/disponibilite',
   getParentRoute: () => rootRouteImport,
 } as any)
-const Char91DotwellKnownChar93OauthProtectedResourceRoute =
-  Char91DotwellKnownChar93OauthProtectedResourceRouteImport.update({
-    id: '/.well-known/oauth-protected-resource',
-    path: '/.well-known/oauth-protected-resource',
-    getParentRoute: () => rootRouteImport,
-  } as any)
+const EligibiliteRoute = EligibiliteRouteImport.update({
+  id: '/eligibilite',
+  path: '/eligibilite',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const InscriptionDonneurRoute = InscriptionDonneurRouteImport.update({
+  id: '/inscription-donneur',
+  path: '/inscription-donneur',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const McpRoute = McpRouteImport.update({
+  id: '/mcp',
+  path: '/mcp',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SaisieDonneesRoute = SaisieDonneesRouteImport.update({
+  id: '/saisie-donnees',
+  path: '/saisie-donnees',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const Char91DotmcpChar93ListToolsRoute =
   Char91DotmcpChar93ListToolsRouteImport.update({
     id: '/.mcp/list-tools',
     path: '/.mcp/list-tools',
     getParentRoute: () => rootRouteImport,
   } as any)
+const Char91DotwellKnownChar93OauthProtectedResourceRoute =
+  Char91DotwellKnownChar93OauthProtectedResourceRouteImport.update({
+    id: '/.well-known/oauth-protected-resource',
+    path: '/.well-known/oauth-protected-resource',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiChatRoute = ApiChatRouteImport.update({
+  id: '/api/chat',
+  path: '/api/chat',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const Char91DotmcpChar93InvokeToolToolRoute =
   Char91DotmcpChar93InvokeToolToolRouteImport.update({
     id: '/.mcp/invoke-tool/$tool',
@@ -191,46 +191,11 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/saisie-donnees': {
-      id: '/saisie-donnees'
-      path: '/saisie-donnees'
-      fullPath: '/saisie-donnees'
-      preLoaderRoute: typeof SaisieDonneesRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/mcp': {
-      id: '/mcp'
-      path: '/mcp'
-      fullPath: '/mcp'
-      preLoaderRoute: typeof McpRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/inscription-donneur': {
-      id: '/inscription-donneur'
-      path: '/inscription-donneur'
-      fullPath: '/inscription-donneur'
-      preLoaderRoute: typeof InscriptionDonneurRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/eligibilite': {
-      id: '/eligibilite'
-      path: '/eligibilite'
-      fullPath: '/eligibilite'
-      preLoaderRoute: typeof EligibiliteRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/disponibilite': {
-      id: '/disponibilite'
-      path: '/disponibilite'
-      fullPath: '/disponibilite'
-      preLoaderRoute: typeof DisponibiliteRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/contact': {
-      id: '/contact'
-      path: '/contact'
-      fullPath: '/contact'
-      preLoaderRoute: typeof ContactRouteImport
+    '/': {
+      id: '/'
+      path: '/'
+      fullPath: '/'
+      preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/assistant': {
@@ -240,18 +205,53 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AssistantRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/': {
-      id: '/'
-      path: '/'
-      fullPath: '/'
-      preLoaderRoute: typeof IndexRouteImport
+    '/contact': {
+      id: '/contact'
+      path: '/contact'
+      fullPath: '/contact'
+      preLoaderRoute: typeof ContactRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/api/chat': {
-      id: '/api/chat'
-      path: '/api/chat'
-      fullPath: '/api/chat'
-      preLoaderRoute: typeof ApiChatRouteImport
+    '/disponibilite': {
+      id: '/disponibilite'
+      path: '/disponibilite'
+      fullPath: '/disponibilite'
+      preLoaderRoute: typeof DisponibiliteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/eligibilite': {
+      id: '/eligibilite'
+      path: '/eligibilite'
+      fullPath: '/eligibilite'
+      preLoaderRoute: typeof EligibiliteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/inscription-donneur': {
+      id: '/inscription-donneur'
+      path: '/inscription-donneur'
+      fullPath: '/inscription-donneur'
+      preLoaderRoute: typeof InscriptionDonneurRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/mcp': {
+      id: '/mcp'
+      path: '/mcp'
+      fullPath: '/mcp'
+      preLoaderRoute: typeof McpRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/saisie-donnees': {
+      id: '/saisie-donnees'
+      path: '/saisie-donnees'
+      fullPath: '/saisie-donnees'
+      preLoaderRoute: typeof SaisieDonneesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/.mcp/list-tools': {
+      id: '/.mcp/list-tools'
+      path: '/.mcp/list-tools'
+      fullPath: '/.mcp/list-tools'
+      preLoaderRoute: typeof Char91DotmcpChar93ListToolsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/.well-known/oauth-protected-resource': {
@@ -261,11 +261,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof Char91DotwellKnownChar93OauthProtectedResourceRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/.mcp/list-tools': {
-      id: '/.mcp/list-tools'
-      path: '/.mcp/list-tools'
-      fullPath: '/.mcp/list-tools'
-      preLoaderRoute: typeof Char91DotmcpChar93ListToolsRouteImport
+    '/api/chat': {
+      id: '/api/chat'
+      path: '/api/chat'
+      fullPath: '/api/chat'
+      preLoaderRoute: typeof ApiChatRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/.mcp/invoke-tool/$tool': {
