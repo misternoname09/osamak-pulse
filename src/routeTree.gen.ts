@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as SaisieDonneesRouteImport } from './routes/saisie-donnees'
 import { Route as McpRouteImport } from './routes/mcp'
 import { Route as InscriptionDonneurRouteImport } from './routes/inscription-donneur'
+import { Route as EligibiliteRouteImport } from './routes/eligibilite'
 import { Route as DisponibiliteRouteImport } from './routes/disponibilite'
 import { Route as ContactRouteImport } from './routes/contact'
 import { Route as AssistantRouteImport } from './routes/assistant'
@@ -34,6 +35,11 @@ const McpRoute = McpRouteImport.update({
 const InscriptionDonneurRoute = InscriptionDonneurRouteImport.update({
   id: '/inscription-donneur',
   path: '/inscription-donneur',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const EligibiliteRoute = EligibiliteRouteImport.update({
+  id: '/eligibilite',
+  path: '/eligibilite',
   getParentRoute: () => rootRouteImport,
 } as any)
 const DisponibiliteRoute = DisponibiliteRouteImport.update({
@@ -85,6 +91,7 @@ export interface FileRoutesByFullPath {
   '/assistant': typeof AssistantRoute
   '/contact': typeof ContactRoute
   '/disponibilite': typeof DisponibiliteRoute
+  '/eligibilite': typeof EligibiliteRoute
   '/inscription-donneur': typeof InscriptionDonneurRoute
   '/mcp': typeof McpRoute
   '/saisie-donnees': typeof SaisieDonneesRoute
@@ -98,6 +105,7 @@ export interface FileRoutesByTo {
   '/assistant': typeof AssistantRoute
   '/contact': typeof ContactRoute
   '/disponibilite': typeof DisponibiliteRoute
+  '/eligibilite': typeof EligibiliteRoute
   '/inscription-donneur': typeof InscriptionDonneurRoute
   '/mcp': typeof McpRoute
   '/saisie-donnees': typeof SaisieDonneesRoute
@@ -112,6 +120,7 @@ export interface FileRoutesById {
   '/assistant': typeof AssistantRoute
   '/contact': typeof ContactRoute
   '/disponibilite': typeof DisponibiliteRoute
+  '/eligibilite': typeof EligibiliteRoute
   '/inscription-donneur': typeof InscriptionDonneurRoute
   '/mcp': typeof McpRoute
   '/saisie-donnees': typeof SaisieDonneesRoute
@@ -127,6 +136,7 @@ export interface FileRouteTypes {
     | '/assistant'
     | '/contact'
     | '/disponibilite'
+    | '/eligibilite'
     | '/inscription-donneur'
     | '/mcp'
     | '/saisie-donnees'
@@ -140,6 +150,7 @@ export interface FileRouteTypes {
     | '/assistant'
     | '/contact'
     | '/disponibilite'
+    | '/eligibilite'
     | '/inscription-donneur'
     | '/mcp'
     | '/saisie-donnees'
@@ -153,6 +164,7 @@ export interface FileRouteTypes {
     | '/assistant'
     | '/contact'
     | '/disponibilite'
+    | '/eligibilite'
     | '/inscription-donneur'
     | '/mcp'
     | '/saisie-donnees'
@@ -167,6 +179,7 @@ export interface RootRouteChildren {
   AssistantRoute: typeof AssistantRoute
   ContactRoute: typeof ContactRoute
   DisponibiliteRoute: typeof DisponibiliteRoute
+  EligibiliteRoute: typeof EligibiliteRoute
   InscriptionDonneurRoute: typeof InscriptionDonneurRoute
   McpRoute: typeof McpRoute
   SaisieDonneesRoute: typeof SaisieDonneesRoute
@@ -197,6 +210,13 @@ declare module '@tanstack/react-router' {
       path: '/inscription-donneur'
       fullPath: '/inscription-donneur'
       preLoaderRoute: typeof InscriptionDonneurRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/eligibilite': {
+      id: '/eligibilite'
+      path: '/eligibilite'
+      fullPath: '/eligibilite'
+      preLoaderRoute: typeof EligibiliteRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/disponibilite': {
@@ -263,6 +283,7 @@ const rootRouteChildren: RootRouteChildren = {
   AssistantRoute: AssistantRoute,
   ContactRoute: ContactRoute,
   DisponibiliteRoute: DisponibiliteRoute,
+  EligibiliteRoute: EligibiliteRoute,
   InscriptionDonneurRoute: InscriptionDonneurRoute,
   McpRoute: McpRoute,
   SaisieDonneesRoute: SaisieDonneesRoute,
