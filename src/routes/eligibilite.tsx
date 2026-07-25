@@ -140,7 +140,17 @@ function EligibilitePage() {
   const onSubmit = (evt: FormEvent) => {
     evt.preventDefault();
     if (!validate()) return;
-    setResult(computeResult());
+    const r = computeResult();
+    setResult(r);
+    if (r?.status === "eligible") {
+      try {
+        const birthYear = new Date().getFullYear() - Number(form.age);
+        sessionStorage.setItem(
+          "osamak.prefill",
+          JSON.stringify({ birthYear: String(birthYear), gender: form.gender }),
+        );
+      } catch { /* ignore */ }
+    }
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
