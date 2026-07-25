@@ -41,6 +41,20 @@ function InscriptionDonneurPage() {
   const [form, setForm] = useState<FormState>(INITIAL);
   const [errors, setErrors] = useState<Partial<Record<keyof FormState, string>>>({});
   const [submitted, setSubmitted] = useState<null | { ref: string; name: string }>(null);
+  const [prefilled, setPrefilled] = useState(false);
+
+  useEffect(() => {
+    try {
+      const raw = sessionStorage.getItem("osamak.prefill");
+      if (!raw) return;
+      const data = JSON.parse(raw) as { birthYear?: string };
+      if (data.birthYear) {
+        setForm((f) => ({ ...f, birthYear: data.birthYear ?? f.birthYear }));
+        setPrefilled(true);
+      }
+      sessionStorage.removeItem("osamak.prefill");
+    } catch { /* ignore */ }
+  }, []);
 
   const update = <K extends keyof FormState>(k: K, v: FormState[K]) => {
     setForm((f) => ({ ...f, [k]: v }));
