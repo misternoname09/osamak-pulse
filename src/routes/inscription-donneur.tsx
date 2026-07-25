@@ -114,6 +114,12 @@ function InscriptionDonneurPage() {
 
           </div>
 
+          {prefilled && !submitted && (
+            <div className="mt-6 rounded-xl border border-success/30 bg-success/10 p-3 text-sm text-success text-center">
+              ✅ Formulaire pré-rempli à partir de votre test d'éligibilité.
+            </div>
+          )}
+
           {submitted ? (
             <div className="mt-10 rounded-2xl border border-primary/30 bg-primary/5 p-6 text-center">
               <div className="text-4xl">✅</div>
