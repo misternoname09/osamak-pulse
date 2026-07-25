@@ -18,9 +18,11 @@ export function SiteLayout({ children }: { children: ReactNode }) {
           <nav className="hidden md:flex items-center gap-1">
             <Link to="/" className={navLink} activeProps={{ className: activeCls }} activeOptions={{ exact: true }}>Accueil</Link>
             <Link to="/disponibilite" className={navLink} activeProps={{ className: activeCls }}>Disponibilité sang</Link>
+            <Link to="/eligibilite" className={navLink} activeProps={{ className: activeCls }}>Éligibilité</Link>
             <Link to="/assistant" className={navLink} activeProps={{ className: activeCls }}>Assistant IA</Link>
             <Link to="/saisie-donnees" className={navLink} activeProps={{ className: activeCls }}>Saisie terrain</Link>
             <Link to="/contact" className={navLink} activeProps={{ className: activeCls }}>Contact</Link>
+
           </nav>
           <button
             className="md:hidden inline-flex items-center justify-center w-10 h-10 rounded-md border border-border"
@@ -35,9 +37,11 @@ export function SiteLayout({ children }: { children: ReactNode }) {
             <div className="px-4 py-2 flex flex-col">
               <Link to="/" className={navLink} onClick={() => setOpen(false)} activeProps={{ className: activeCls }} activeOptions={{ exact: true }}>Accueil</Link>
               <Link to="/disponibilite" className={navLink} onClick={() => setOpen(false)} activeProps={{ className: activeCls }}>Disponibilité sang</Link>
+              <Link to="/eligibilite" className={navLink} onClick={() => setOpen(false)} activeProps={{ className: activeCls }}>Éligibilité</Link>
               <Link to="/assistant" className={navLink} onClick={() => setOpen(false)} activeProps={{ className: activeCls }}>Assistant IA</Link>
               <Link to="/saisie-donnees" className={navLink} onClick={() => setOpen(false)} activeProps={{ className: activeCls }}>Saisie terrain</Link>
               <Link to="/contact" className={navLink} onClick={() => setOpen(false)} activeProps={{ className: activeCls }}>Contact</Link>
+
             </div>
           </div>
         )}
