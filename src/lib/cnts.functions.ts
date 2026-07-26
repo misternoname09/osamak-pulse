@@ -43,22 +43,21 @@ export const getCntsCenters = createServerFn({ method: "GET" }).handler(async ()
     const raw = (await res.json()) as unknown;
     const list = Array.isArray(raw) ? raw : (raw as { centers?: unknown[] })?.centers;
     if (!Array.isArray(list)) throw new Error("Format CNTS inattendu");
-    const centers: CntsCenter[] = list
-      .map((c) => {
-        const o = c as Record<string, unknown>;
-        const lat = Number(o.lat ?? o.latitude);
-        const lng = Number(o.lng ?? o.longitude);
-        if (!Number.isFinite(lat) || !Number.isFinite(lng)) return null;
-        const status = o.status === "Indisponible" ? "Indisponible" : "Disponible";
-        return {
-          name: String(o.name ?? o.center ?? "Centre CNTS"),
-          lat,
-          lng,
-          status,
-          delay: o.delay ? String(o.delay) : undefined,
-        } satisfies CntsCenter;
-      })
-      .filter((v): v is CntsCenter => v !== null);
+    const centers: CntsCenter[] = [];
+    for (const c of list) {
+      const o = c as Record<string, unknown>;
+      const lat = Number(o.lat ?? o.latitude);
+      const lng = Number(o.lng ?? o.longitude);
+      if (!Number.isFinite(lat) || !Number.isFinite(lng)) continue;
+      const status: CntsCenter["status"] = o.status === "Indisponible" ? "Indisponible" : "Disponible";
+      centers.push({
+        name: String(o.name ?? o.center ?? "Centre CNTS"),
+        lat,
+        lng,
+        status,
+        delay: o.delay ? String(o.delay) : undefined,
+      });
+    }
     if (centers.length === 0) throw new Error("Aucun centre reçu");
     return { centers, source: "cnts", updatedAt: new Date().toISOString() };
   } catch (err) {
