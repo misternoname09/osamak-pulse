@@ -66,7 +66,8 @@ export function BloodCentersMap() {
 
     const initMap = async () => {
       const L = (await import("leaflet")).default;
-      
+      LRef.current = L;
+
       if (!isMounted) return;
 
       // Fix for default leaflet icon issues in React
@@ -78,19 +79,22 @@ export function BloodCentersMap() {
       });
 
       const html = `
-        <div style="color: hsl(var(--primary)); filter: drop-shadow(0px 2px 4px rgba(0,0,0,0.4))">
-          <svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 24 24" fill="currentColor" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M12 22a7 7 0 0 0 7-7c0-2-1-3.9-3-5.5s-3.5-4-4-6.5c-.5 2.5-2 4.9-4 6.5C6 11.1 5 13 5 15a7 7 0 0 0 7 7z"/>
+        <div style="position: relative; width: 44px; height: 54px; filter: drop-shadow(0 4px 6px rgba(0,0,0,0.35));">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 30" width="44" height="54" style="position:absolute; inset:0;">
+            <path d="M12 1 C 12 8, 22 13, 22 21 A 10 10 0 0 1 2 21 C 2 13, 12 8, 12 1 Z"
+                  fill="#E53935" stroke="#ffffff" stroke-width="1.5"/>
           </svg>
+          <img src="${osamakLogo.url}" alt="OSAMAK"
+               style="position:absolute; top:8px; left:50%; transform:translateX(-50%); width:26px; height:26px; border-radius:50%; object-fit:cover; border:2px solid #ffffff; background:#ffffff;" />
         </div>
       `;
 
       const bloodIcon = L.divIcon({
         className: "custom-blood-marker bg-transparent border-none",
         html,
-        iconSize: [36, 36],
-        iconAnchor: [18, 36],
-        popupAnchor: [0, -36],
+        iconSize: [44, 54],
+        iconAnchor: [22, 54],
+        popupAnchor: [0, -50],
       });
 
       // Ensure we don't initialize map multiple times
