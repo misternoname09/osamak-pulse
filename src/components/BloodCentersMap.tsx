@@ -198,7 +198,7 @@ export function BloodCentersMap() {
         mapInstance.current = null;
       }
     };
-  }, []);
+  }, [centers]);
 
   return (
     <div className="my-10">
