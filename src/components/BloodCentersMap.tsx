@@ -12,6 +12,33 @@ export function BloodCentersMap() {
   const userMarkerRef = useRef<any>(null);
   const [locating, setLocating] = useState(false);
   const [locError, setLocError] = useState<string | null>(null);
+  const [centers, setCenters] = useState<Center[] | null>(null);
+  const [dataError, setDataError] = useState<string | null>(null);
+  const [source, setSource] = useState<"cnts" | "fallback" | null>(null);
+  const [updatedAt, setUpdatedAt] = useState<string | null>(null);
+  const [loadingData, setLoadingData] = useState(true);
+
+  const loadCenters = async () => {
+    setLoadingData(true);
+    setDataError(null);
+    try {
+      const res = await getCntsCenters();
+      setCenters(res.centers);
+      setSource(res.source);
+      setUpdatedAt(res.updatedAt);
+      if (res.error) setDataError(res.error);
+    } catch (err) {
+      setDataError(err instanceof Error ? err.message : "Erreur lors du chargement des centres CNTS.");
+      setCenters([]);
+    } finally {
+      setLoadingData(false);
+    }
+  };
+
+  useEffect(() => {
+    loadCenters();
+  }, []);
+
 
   const locateMe = () => {
     setLocError(null);
