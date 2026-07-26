@@ -1,19 +1,9 @@
 import { useEffect, useRef, useState } from "react";
 import osamakLogo from "@/assets/osamak-logo.jpeg.asset.json";
+import { getCntsCenters, type CntsCenter } from "@/lib/cnts.functions";
 
-type Center = {
-  name: string;
-  lat: number;
-  lng: number;
-  status: "Disponible" | "Indisponible";
-  delay?: string;
-};
+type Center = CntsCenter;
 
-const CENTERS: Center[] = [
-  { name: "CNTS Dakar", lat: 14.728186, lng: -17.443196, status: "Disponible", delay: "2–3h" },
-  { name: "Hôpital Principal Dakar", lat: 14.662557, lng: -17.435028, status: "Disponible", delay: "4h" },
-  { name: "Hôpital Fann", lat: 14.693259, lng: -17.464911, status: "Disponible", delay: "3h" },
-];
 
 export function BloodCentersMap() {
   const mapRef = useRef<HTMLDivElement>(null);
