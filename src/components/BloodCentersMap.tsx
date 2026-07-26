@@ -78,6 +78,8 @@ export function BloodCentersMap() {
 
   useEffect(() => {
     if (typeof window === "undefined" || !mapRef.current) return;
+    if (!centers) return;
+
 
     let isMounted = true;
 
