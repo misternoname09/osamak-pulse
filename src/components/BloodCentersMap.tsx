@@ -135,7 +135,7 @@ export function BloodCentersMap() {
       }).addTo(map);
 
       // Add Markers
-      CENTERS.forEach((center) => {
+      centers.forEach((center: Center) => {
         const marker = L.marker([center.lat, center.lng], {
           icon: bloodIcon,
         }).addTo(map);
