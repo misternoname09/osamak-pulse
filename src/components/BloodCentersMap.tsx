@@ -1,4 +1,5 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
+import osamakLogo from "@/assets/osamak-logo.jpeg.asset.json";
 
 type Center = {
   name: string;
