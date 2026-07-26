@@ -18,6 +18,46 @@ const CENTERS: Center[] = [
 export function BloodCentersMap() {
   const mapRef = useRef<HTMLDivElement>(null);
   const mapInstance = useRef<any>(null);
+  const LRef = useRef<any>(null);
+  const userMarkerRef = useRef<any>(null);
+  const [locating, setLocating] = useState(false);
+  const [locError, setLocError] = useState<string | null>(null);
+
+  const locateMe = () => {
+    setLocError(null);
+    if (!navigator.geolocation) {
+      setLocError("Géolocalisation non supportée par ce navigateur.");
+      return;
+    }
+    setLocating(true);
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        setLocating(false);
+        const L = LRef.current;
+        const map = mapInstance.current;
+        if (!L || !map) return;
+        const { latitude, longitude } = pos.coords;
+        if (userMarkerRef.current) {
+          userMarkerRef.current.remove();
+        }
+        userMarkerRef.current = L.circleMarker([latitude, longitude], {
+          radius: 9,
+          color: "#1565C0",
+          fillColor: "#1565C0",
+          fillOpacity: 0.7,
+          weight: 3,
+        })
+          .addTo(map)
+          .bindPopup("Vous êtes ici");
+        map.setView([latitude, longitude], 13);
+      },
+      (err) => {
+        setLocating(false);
+        setLocError(err.message || "Impossible d'obtenir votre position.");
+      },
+      { enableHighAccuracy: true, timeout: 10000 }
+    );
+  };
 
   useEffect(() => {
     if (typeof window === "undefined" || !mapRef.current) return;
