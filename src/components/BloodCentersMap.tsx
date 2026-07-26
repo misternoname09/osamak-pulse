@@ -224,11 +224,37 @@ export function BloodCentersMap() {
         >
           🧭 Itinéraire vers CNTS
         </a>
+        <button
+          onClick={loadCenters}
+          disabled={loadingData}
+          className="inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-semibold border border-border bg-card hover:border-primary/50 transition disabled:opacity-60"
+        >
+          {loadingData ? "⏳ Actualisation..." : "🔄 Actualiser CNTS"}
+        </button>
       </div>
       {locError && (
         <p className="mb-3 text-sm text-destructive" role="alert">{locError}</p>
       )}
+      {source && (
+        <p className="mb-3 text-xs text-muted-foreground">
+          {source === "cnts" ? "✅ Données CNTS" : "ℹ️ Données de démonstration"}
+          {updatedAt && ` — mis à jour ${new Date(updatedAt).toLocaleTimeString("fr-FR")}`}
+        </p>
+      )}
+      {dataError && (
+        <div
+          className="mb-3 rounded-lg border border-destructive/30 bg-destructive/10 px-4 py-3 text-sm text-destructive"
+          role="alert"
+        >
+          <strong>Données CNTS indisponibles :</strong> {dataError}
+        </div>
+      )}
       <div className="w-full h-[500px] rounded-2xl overflow-hidden border border-border shadow-sm relative z-0">
+        {loadingData && !centers && (
+          <div className="absolute inset-0 z-10 flex items-center justify-center bg-muted/60 text-sm text-muted-foreground">
+            ⏳ Chargement des centres CNTS...
+          </div>
+        )}
         <div ref={mapRef} className="w-full h-full" />
       </div>
     </div>
