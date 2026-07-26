@@ -182,8 +182,36 @@ export function BloodCentersMap() {
   }, []);
 
   return (
-    <div className="w-full h-[500px] rounded-2xl overflow-hidden border border-border shadow-sm my-10 relative z-0">
-      <div ref={mapRef} className="w-full h-full" />
+    <div className="my-10">
+      <div className="flex flex-wrap gap-2 mb-3">
+        <button
+          onClick={locateMe}
+          disabled={locating}
+          className="inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-semibold bg-accent text-accent-foreground hover:opacity-90 transition disabled:opacity-60"
+        >
+          {locating ? "⏳ Localisation..." : "📍 Me localiser"}
+        </button>
+        <a
+          href="tel:+221338691818"
+          className="inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-semibold bg-primary text-primary-foreground hover:opacity-90 transition"
+        >
+          📞 Appeler CNTS Dakar
+        </a>
+        <a
+          href="https://www.google.com/maps/dir/?api=1&destination=14.728186,-17.443196"
+          target="_blank"
+          rel="noreferrer"
+          className="inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-semibold border border-border bg-card hover:border-primary/50 transition"
+        >
+          🧭 Itinéraire vers CNTS
+        </a>
+      </div>
+      {locError && (
+        <p className="mb-3 text-sm text-destructive" role="alert">{locError}</p>
+      )}
+      <div className="w-full h-[500px] rounded-2xl overflow-hidden border border-border shadow-sm relative z-0">
+        <div ref={mapRef} className="w-full h-full" />
+      </div>
     </div>
   );
 }
