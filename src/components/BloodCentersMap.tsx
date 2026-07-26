@@ -1,19 +1,9 @@
 import { useEffect, useRef, useState } from "react";
 import osamakLogo from "@/assets/osamak-logo.jpeg.asset.json";
+import { getCntsCenters, type CntsCenter } from "@/lib/cnts.functions";
 
-type Center = {
-  name: string;
-  lat: number;
-  lng: number;
-  status: "Disponible" | "Indisponible";
-  delay?: string;
-};
+type Center = CntsCenter;
 
-const CENTERS: Center[] = [
-  { name: "CNTS Dakar", lat: 14.728186, lng: -17.443196, status: "Disponible", delay: "2–3h" },
-  { name: "Hôpital Principal Dakar", lat: 14.662557, lng: -17.435028, status: "Disponible", delay: "4h" },
-  { name: "Hôpital Fann", lat: 14.693259, lng: -17.464911, status: "Disponible", delay: "3h" },
-];
 
 export function BloodCentersMap() {
   const mapRef = useRef<HTMLDivElement>(null);
@@ -22,6 +12,33 @@ export function BloodCentersMap() {
   const userMarkerRef = useRef<any>(null);
   const [locating, setLocating] = useState(false);
   const [locError, setLocError] = useState<string | null>(null);
+  const [centers, setCenters] = useState<Center[] | null>(null);
+  const [dataError, setDataError] = useState<string | null>(null);
+  const [source, setSource] = useState<"cnts" | "fallback" | null>(null);
+  const [updatedAt, setUpdatedAt] = useState<string | null>(null);
+  const [loadingData, setLoadingData] = useState(true);
+
+  const loadCenters = async () => {
+    setLoadingData(true);
+    setDataError(null);
+    try {
+      const res = await getCntsCenters();
+      setCenters(res.centers);
+      setSource(res.source);
+      setUpdatedAt(res.updatedAt);
+      if (res.error) setDataError(res.error);
+    } catch (err) {
+      setDataError(err instanceof Error ? err.message : "Erreur lors du chargement des centres CNTS.");
+      setCenters([]);
+    } finally {
+      setLoadingData(false);
+    }
+  };
+
+  useEffect(() => {
+    loadCenters();
+  }, []);
+
 
   const locateMe = () => {
     setLocError(null);
@@ -61,6 +78,8 @@ export function BloodCentersMap() {
 
   useEffect(() => {
     if (typeof window === "undefined" || !mapRef.current) return;
+    if (!centers) return;
+
 
     let isMounted = true;
 
@@ -116,7 +135,7 @@ export function BloodCentersMap() {
       }).addTo(map);
 
       // Add Markers
-      CENTERS.forEach((center) => {
+      centers.forEach((center: Center) => {
         const marker = L.marker([center.lat, center.lng], {
           icon: bloodIcon,
         }).addTo(map);
@@ -179,7 +198,7 @@ export function BloodCentersMap() {
         mapInstance.current = null;
       }
     };
-  }, []);
+  }, [centers]);
 
   return (
     <div className="my-10">
@@ -205,11 +224,37 @@ export function BloodCentersMap() {
         >
           🧭 Itinéraire vers CNTS
         </a>
+        <button
+          onClick={loadCenters}
+          disabled={loadingData}
+          className="inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-semibold border border-border bg-card hover:border-primary/50 transition disabled:opacity-60"
+        >
+          {loadingData ? "⏳ Actualisation..." : "🔄 Actualiser CNTS"}
+        </button>
       </div>
       {locError && (
         <p className="mb-3 text-sm text-destructive" role="alert">{locError}</p>
       )}
+      {source && (
+        <p className="mb-3 text-xs text-muted-foreground">
+          {source === "cnts" ? "✅ Données CNTS" : "ℹ️ Données de démonstration"}
+          {updatedAt && ` — mis à jour ${new Date(updatedAt).toLocaleTimeString("fr-FR")}`}
+        </p>
+      )}
+      {dataError && (
+        <div
+          className="mb-3 rounded-lg border border-destructive/30 bg-destructive/10 px-4 py-3 text-sm text-destructive"
+          role="alert"
+        >
+          <strong>Données CNTS indisponibles :</strong> {dataError}
+        </div>
+      )}
       <div className="w-full h-[500px] rounded-2xl overflow-hidden border border-border shadow-sm relative z-0">
+        {loadingData && !centers && (
+          <div className="absolute inset-0 z-10 flex items-center justify-center bg-muted/60 text-sm text-muted-foreground">
+            ⏳ Chargement des centres CNTS...
+          </div>
+        )}
         <div ref={mapRef} className="w-full h-full" />
       </div>
     </div>
