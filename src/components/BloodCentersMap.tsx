@@ -255,16 +255,17 @@ export function BloodCentersMap() {
       )}
       {source && (
         <p className="mb-3 text-xs text-muted-foreground">
-          {source === "cnts" ? "✅ Données CNTS" : "ℹ️ Données de démonstration"}
+          {source === "cnts" ? "✅ Base de référence CNTS Sénégal" : "ℹ️ Données de démonstration"}
+          {centers && ` — ${centers.length} centres`}
           {updatedAt && ` — mis à jour ${new Date(updatedAt).toLocaleTimeString("fr-FR")}`}
         </p>
       )}
       {dataError && (
         <div
-          className="mb-3 rounded-lg border border-destructive/30 bg-destructive/10 px-4 py-3 text-sm text-destructive"
-          role="alert"
+          className="mb-3 rounded-lg border border-accent/30 bg-accent/10 px-4 py-3 text-sm text-accent-foreground"
+          role="status"
         >
-          <strong>Données CNTS indisponibles :</strong> {dataError}
+          <strong>Info CNTS :</strong> {dataError}
         </div>
       )}
       <div className="w-full h-[500px] rounded-2xl overflow-hidden border border-border shadow-sm relative z-0">
