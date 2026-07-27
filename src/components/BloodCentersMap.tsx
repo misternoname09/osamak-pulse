@@ -169,8 +169,26 @@ export function BloodCentersMap() {
               </div>
           `;
         }
-
+        if (center.region) {
+          popupHtml += `
+              <div class="flex items-center justify-between gap-4">
+                <span class="text-muted-foreground">Région</span>
+                <span class="font-medium">${center.region}</span>
+              </div>
+          `;
+        }
+        if (center.address) {
+          popupHtml += `<div class="text-muted-foreground text-xs mt-1">📍 ${center.address}</div>`;
+        }
+        if (center.hours) {
+          popupHtml += `<div class="text-muted-foreground text-xs">🕒 ${center.hours}</div>`;
+        }
+        if (center.phone) {
+          const tel = center.phone.replace(/\s+/g, "");
+          popupHtml += `<a href="tel:${tel}" class="mt-2 inline-flex items-center gap-1.5 text-primary font-semibold text-sm">📞 ${center.phone}</a>`;
+        }
         popupHtml += `
+              <a href="https://www.google.com/maps/dir/?api=1&destination=${center.lat},${center.lng}" target="_blank" rel="noreferrer" class="mt-1 inline-flex items-center gap-1.5 text-accent font-semibold text-sm">🧭 Itinéraire</a>
             </div>
           </div>
         `;
@@ -237,16 +255,17 @@ export function BloodCentersMap() {
       )}
       {source && (
         <p className="mb-3 text-xs text-muted-foreground">
-          {source === "cnts" ? "✅ Données CNTS" : "ℹ️ Données de démonstration"}
+          {source === "cnts" ? "✅ Base de référence CNTS Sénégal" : "ℹ️ Données de démonstration"}
+          {centers && ` — ${centers.length} centres`}
           {updatedAt && ` — mis à jour ${new Date(updatedAt).toLocaleTimeString("fr-FR")}`}
         </p>
       )}
       {dataError && (
         <div
-          className="mb-3 rounded-lg border border-destructive/30 bg-destructive/10 px-4 py-3 text-sm text-destructive"
-          role="alert"
+          className="mb-3 rounded-lg border border-accent/30 bg-accent/10 px-4 py-3 text-sm text-accent-foreground"
+          role="status"
         >
-          <strong>Données CNTS indisponibles :</strong> {dataError}
+          <strong>Info CNTS :</strong> {dataError}
         </div>
       )}
       <div className="w-full h-[500px] rounded-2xl overflow-hidden border border-border shadow-sm relative z-0">
@@ -257,6 +276,77 @@ export function BloodCentersMap() {
         )}
         <div ref={mapRef} className="w-full h-full" />
       </div>
+
+      {centers && centers.length > 0 && (
+        <div className="mt-8">
+          <h3 className="text-lg font-bold tracking-tight">Références CNTS — Centres partenaires</h3>
+          <p className="mt-1 text-sm text-muted-foreground">
+            Base de référence des centres de transfusion sanguine au Sénégal.
+          </p>
+          <div className="mt-4 grid gap-3 md:grid-cols-2">
+            {centers.map((c, i) => (
+              <article key={i} className="rounded-xl border border-border bg-card p-4 shadow-sm">
+                <div className="flex items-start justify-between gap-3">
+                  <div>
+                    <h4 className="font-semibold leading-tight">{c.name}</h4>
+                    {c.region && (
+                      <p className="text-xs text-muted-foreground mt-0.5">Région : {c.region}</p>
+                    )}
+                  </div>
+                  <span
+                    className={
+                      "shrink-0 inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-xs font-semibold " +
+                      (c.status === "Disponible"
+                        ? "bg-success/15 text-success"
+                        : "bg-destructive/10 text-destructive")
+                    }
+                  >
+                    <span
+                      className={
+                        "w-1.5 h-1.5 rounded-full " +
+                        (c.status === "Disponible" ? "bg-success" : "bg-destructive")
+                      }
+                    />
+                    {c.status}
+                  </span>
+                </div>
+                <dl className="mt-3 space-y-1 text-sm">
+                  {c.address && (
+                    <div className="flex gap-2"><dt className="text-muted-foreground">📍</dt><dd>{c.address}</dd></div>
+                  )}
+                  {c.hours && (
+                    <div className="flex gap-2"><dt className="text-muted-foreground">🕒</dt><dd>{c.hours}</dd></div>
+                  )}
+                  {c.delay && (
+                    <div className="flex gap-2"><dt className="text-muted-foreground">⏱️</dt><dd>Délai moyen : {c.delay}</dd></div>
+                  )}
+                </dl>
+                <div className="mt-3 flex flex-wrap gap-2">
+                  {c.phone && (
+                    <a
+                      href={`tel:${c.phone.replace(/\s+/g, "")}`}
+                      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold bg-primary text-primary-foreground hover:opacity-90 transition"
+                    >
+                      📞 {c.phone}
+                    </a>
+                  )}
+                  <a
+                    href={`https://www.google.com/maps/dir/?api=1&destination=${c.lat},${c.lng}`}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold border border-border bg-card hover:border-primary/50 transition"
+                  >
+                    🧭 Itinéraire
+                  </a>
+                </div>
+              </article>
+            ))}
+          </div>
+          <p className="mt-4 text-xs text-muted-foreground">
+            Sources : Centre National de Transfusion Sanguine (CNTS Dakar) — Ministère de la Santé et de l'Action Sociale du Sénégal — hôpitaux régionaux partenaires.
+          </p>
+        </div>
+      )}
     </div>
   );
 }
