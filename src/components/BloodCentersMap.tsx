@@ -169,8 +169,26 @@ export function BloodCentersMap() {
               </div>
           `;
         }
-
+        if (center.region) {
+          popupHtml += `
+              <div class="flex items-center justify-between gap-4">
+                <span class="text-muted-foreground">Région</span>
+                <span class="font-medium">${center.region}</span>
+              </div>
+          `;
+        }
+        if (center.address) {
+          popupHtml += `<div class="text-muted-foreground text-xs mt-1">📍 ${center.address}</div>`;
+        }
+        if (center.hours) {
+          popupHtml += `<div class="text-muted-foreground text-xs">🕒 ${center.hours}</div>`;
+        }
+        if (center.phone) {
+          const tel = center.phone.replace(/\s+/g, "");
+          popupHtml += `<a href="tel:${tel}" class="mt-2 inline-flex items-center gap-1.5 text-primary font-semibold text-sm">📞 ${center.phone}</a>`;
+        }
         popupHtml += `
+              <a href="https://www.google.com/maps/dir/?api=1&destination=${center.lat},${center.lng}" target="_blank" rel="noreferrer" class="mt-1 inline-flex items-center gap-1.5 text-accent font-semibold text-sm">🧭 Itinéraire</a>
             </div>
           </div>
         `;
