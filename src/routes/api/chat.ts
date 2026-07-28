@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { convertToModelMessages, streamText, type UIMessage } from "ai";
-import { createLovableAiGatewayProvider } from "@/lib/ai-gateway.server";
+import { createOpenAICompatible } from "@ai-sdk/openai-compatible";
 
 const SYSTEM_PROMPT = `Tu es un expert en santé publique et transfusion sanguine au Sénégal, intégré à la plateforme OSAMAK.
 
@@ -39,14 +39,21 @@ export const Route = createFileRoute("/api/chat")({
           return new Response("Messages are required", { status: 400 });
         }
 
-        const key = process.env.LOVABLE_API_KEY;
+        const key = process.env.VITE_GROQ_API_KEY || (import.meta as any).env?.VITE_GROQ_API_KEY;
         if (!key) {
-          return new Response("Missing LOVABLE_API_KEY", { status: 500 });
+          return new Response("Missing VITE_GROQ_API_KEY", { status: 500 });
         }
 
-        const gateway = createLovableAiGatewayProvider(key);
+        const groq = createOpenAICompatible({
+          name: 'groq',
+          baseURL: 'https://api.groq.com/openai/v1',
+          headers: {
+            Authorization: `Bearer ${key}`,
+          },
+        });
+
         const result = streamText({
-          model: gateway("google/gemini-3-flash-preview"),
+          model: groq("llama-3.3-70b-versatile"),
           system: SYSTEM_PROMPT,
           messages: await convertToModelMessages(messages as UIMessage[]),
         });

@@ -1,16 +1,13 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState, type FormEvent } from "react";
 import { SiteLayout } from "@/components/SiteLayout";
+import { Stethoscope, FileText, Send, Loader2, Bot, AlertTriangle, ShieldCheck } from "lucide-react";
 
 export const Route = createFileRoute("/saisie-donnees")({
   head: () => ({
     meta: [
-      { title: "Saisie Données Terrain — OSAMAK" },
-      { name: "description", content: "Formulaire de saisie terrain pour agents de santé OSAMAK." },
-      { property: "og:title", content: "Saisie Données Terrain — OSAMAK" },
-      { property: "og:description", content: "Formulaire de saisie terrain pour agents de santé OSAMAK." },
-      { property: "og:type", content: "website" },
-      { name: "twitter:card", content: "summary" },
+      { title: "Portail Médical (Agents) — OSAMAK" },
+      { name: "description", content: "Interface réservée aux professionnels de santé pour la saisie et l'analyse des données de transfusion sanguine." },
     ],
   }),
   component: SaisieDonneesPage,
@@ -25,135 +22,140 @@ function SaisieDonneesPage() {
 
   const submit = async (e: FormEvent) => {
     e.preventDefault();
-    if (loading) return;
+    if (loading || (!donneesSante.trim() && !question.trim())) return;
 
     setLoading(true);
     setError(null);
     setResult(null);
 
+    const prompt = `En tant qu'assistant médical IA du CNTS (Centre National de Transfusion Sanguine du Sénégal), analyse les observations médicales suivantes de l'agent de santé, et réponds à sa question avec rigueur et précision.
+Observations : ${donneesSante || "Aucune observation fournie."}
+Question de l'agent : ${question}`;
+
     try {
-      const res = await fetch("https://api.dify.ai/v1/chat-messages", {
+      const res = await fetch("https://api.groq.com/openai/v1/chat/completions", {
         method: "POST",
         headers: {
-          Authorization: "Bearer app-LGSZmJYt4J79PsGRtVQA344y",
+          Authorization: `Bearer ${import.meta.env.VITE_GROQ_API_KEY || "VOTRE_CLE_API_GROQ_ICI"}`,
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          inputs: {
-            query: question,
-            donnees_sante: donneesSante,
-          },
-          query: question,
-          response_mode: "blocking",
-          user: "agent-sante",
+          model: "llama-3.3-70b-versatile",
+          messages: [{ role: "user", content: prompt }]
         }),
       });
 
-      if (!res.ok) throw new Error("http");
-
+      if (!res.ok) throw new Error("Erreur de l'API");
       const data = await res.json();
-      const text =
-        typeof data?.answer === "string"
-          ? data.answer
-          : data?.data?.outputs?.text ?? "Aucune réponse reçue.";
-      setResult(typeof text === "string" ? text : "Aucune réponse reçue.");
+      const text = data.choices?.[0]?.message?.content || "Aucune réponse générée.";
+      setResult(text);
     } catch {
-      setError("❌ Erreur — réessayer");
+      setError("La connexion au serveur d'analyse a échoué. Veuillez vérifier votre réseau interne.");
     } finally {
       setLoading(false);
     }
   };
 
+  const inputCls = "w-full rounded-2xl border-2 border-border bg-background px-5 py-4 font-medium focus:outline-none focus:ring-4 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all";
+
   return (
     <SiteLayout>
-      <section className="py-12 md:py-16">
-        <div className="mx-auto max-w-3xl px-4">
-          <div className="text-center">
-            <h1 className="text-3xl md:text-4xl font-bold text-primary">
-              🩸 Saisie Données Terrain
+      <div className="bg-emerald-500/5 min-h-[calc(100vh-64px)] py-12 md:py-20 relative overflow-hidden">
+        {/* Background elements */}
+        <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-emerald-500/5 blur-[120px] rounded-full pointer-events-none" />
+        
+        <div className="mx-auto max-w-4xl px-4 relative z-10">
+          <div className="text-center mb-12 animate-in fade-in slide-in-from-bottom-4 duration-700">
+            <div className="inline-flex items-center gap-2 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-700 px-4 py-1.5 text-sm font-bold shadow-sm mb-6">
+              <ShieldCheck className="w-4 h-4" /> Accès Sécurisé — Professionnels de Santé
+            </div>
+            <h1 className="text-4xl md:text-5xl font-extrabold tracking-tight mb-4">
+              Portail Médical <span className="text-emerald-600">Agents CNTS</span>
             </h1>
-            <p className="mt-2 text-base md:text-lg text-muted-foreground">
-              Agent santé — Données en temps réel
+            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+              Saisissez les observations cliniques et interrogez le modèle prédictif pour optimiser la gestion des stocks de sang.
             </p>
           </div>
 
-          <form
-            onSubmit={submit}
-            className="mt-8 md:mt-10 rounded-2xl bg-card border border-border p-5 md:p-6 shadow-sm space-y-5"
-          >
-            <div>
-              <label
-                htmlFor="donnees-sante"
-                className="block text-sm font-semibold text-foreground"
-              >
-                Observations médicales
-              </label>
-              <textarea
-                id="donnees-sante"
-                value={donneesSante}
-                onChange={(e) => setDonneesSante(e.target.value)}
-                rows={6}
-                placeholder="Ex: CNTS Dakar 23/07/2026 14h — Groupe O+ : 2 donneurs disponibles"
-                className="mt-2 w-full resize-none rounded-xl border border-border bg-background px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary/40"
-                disabled={loading}
-              />
+          <div className="grid lg:grid-cols-2 gap-8 items-start">
+            <div className="animate-in fade-in slide-in-from-bottom-8 duration-700 delay-100">
+              <form onSubmit={submit} className="rounded-[2rem] bg-card/90 backdrop-blur-xl border border-border p-8 shadow-2xl space-y-6 relative overflow-hidden">
+                <div className="absolute top-0 left-0 w-1 h-full bg-emerald-500" />
+                
+                <div>
+                  <label htmlFor="donnees-sante" className="flex items-center gap-2 font-bold mb-3 text-sm uppercase tracking-wide text-muted-foreground">
+                    <FileText className="w-4 h-4 text-emerald-500" /> Observations Terrain
+                  </label>
+                  <textarea
+                    id="donnees-sante" value={donneesSante} onChange={(e) => setDonneesSante(e.target.value)}
+                    rows={6} disabled={loading}
+                    placeholder="Saisissez les données d'affluence, l'état des stocks ou les remarques cliniques (ex: 'Rupture imminente de culots O- au CHU de Fann')."
+                    className={`${inputCls} resize-none`}
+                  />
+                </div>
+
+                <div>
+                  <label htmlFor="question" className="flex items-center gap-2 font-bold mb-3 text-sm uppercase tracking-wide text-muted-foreground">
+                    <Stethoscope className="w-4 h-4 text-emerald-500" /> Requête d'Analyse
+                  </label>
+                  <input
+                    id="question" type="text" value={question} onChange={(e) => setQuestion(e.target.value)}
+                    disabled={loading}
+                    placeholder="Ex: Quel protocole appliquer pour anticiper ce besoin ?"
+                    className={inputCls}
+                  />
+                </div>
+
+                <button
+                  type="submit" disabled={loading || (!donneesSante.trim() && !question.trim())}
+                  className="w-full py-4 rounded-xl bg-emerald-600 text-white font-extrabold text-lg hover:bg-emerald-700 hover:shadow-lg hover:shadow-emerald-600/30 transition-all flex items-center justify-center gap-2 disabled:opacity-50 disabled:hover:shadow-none"
+                >
+                  {loading ? (
+                    <><Loader2 className="w-5 h-5 animate-spin" /> Traitement en cours...</>
+                  ) : (
+                    <><Send className="w-5 h-5" /> Générer l'analyse IA</>
+                  )}
+                </button>
+              </form>
             </div>
 
-            <div>
-              <label
-                htmlFor="question"
-                className="block text-sm font-semibold text-foreground"
-              >
-                Votre question
-              </label>
-              <input
-                id="question"
-                type="text"
-                value={question}
-                onChange={(e) => setQuestion(e.target.value)}
-                placeholder="Ex: Quel est le délai moyen pour trouver un donneur O+ à Dakar ?"
-                className="mt-2 w-full rounded-xl border border-border bg-background px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary/40"
-                disabled={loading}
-              />
+            <div className="animate-in fade-in slide-in-from-bottom-8 duration-700 delay-200">
+              {result ? (
+                <div className="bg-emerald-950 text-emerald-50 rounded-[2rem] p-8 shadow-2xl relative overflow-hidden">
+                  <div className="flex items-center gap-3 border-b border-emerald-800 pb-4 mb-6">
+                    <div className="w-10 h-10 bg-emerald-800 rounded-full flex items-center justify-center">
+                      <Bot className="w-5 h-5 text-emerald-300" />
+                    </div>
+                    <div>
+                      <h3 className="font-bold text-lg text-emerald-100">Rapport d'Analyse</h3>
+                      <div className="text-xs text-emerald-400 font-semibold flex items-center gap-2">
+                        <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" /> Généré par l'IA OSAMAK
+                      </div>
+                    </div>
+                  </div>
+                  <div className="prose prose-invert prose-emerald text-sm leading-relaxed max-w-none whitespace-pre-wrap">
+                    {result}
+                  </div>
+                </div>
+              ) : error ? (
+                <div className="bg-destructive/10 border border-destructive/20 text-destructive rounded-[2rem] p-8 shadow-lg flex flex-col items-center justify-center text-center h-full min-h-[300px]">
+                  <AlertTriangle className="w-12 h-12 mb-4 text-destructive/80" />
+                  <h3 className="text-xl font-bold mb-2">Analyse échouée</h3>
+                  <p className="text-sm font-medium opacity-80">{error}</p>
+                </div>
+              ) : (
+                <div className="bg-card border border-dashed border-border rounded-[2rem] p-8 shadow-sm flex flex-col items-center justify-center text-center h-full min-h-[400px] text-muted-foreground">
+                  <FileText className="w-16 h-16 mb-4 opacity-20" />
+                  <h3 className="text-xl font-bold mb-2 text-foreground">En attente de données</h3>
+                  <p className="text-sm max-w-xs mx-auto">
+                    Le rapport d'analyse s'affichera ici une fois les observations soumises au système.
+                  </p>
+                </div>
+              )}
             </div>
-
-            <div className="pt-1">
-              <button
-                type="submit"
-                disabled={loading}
-                className="w-full inline-flex items-center justify-center gap-2 rounded-xl bg-primary px-5 py-3 text-sm font-semibold text-primary-foreground disabled:opacity-60 hover:bg-primary/90 transition"
-              >
-                {loading && (
-                  <span className="inline-block w-4 h-4 border-2 border-primary-foreground/40 border-t-primary-foreground rounded-full animate-spin" />
-                )}
-                🩸 Générer la fiche
-              </button>
-            </div>
-          </form>
-
-          {loading && (
-            <div className="mt-6 flex items-center justify-center gap-2 text-sm text-muted-foreground">
-              <span className="inline-block w-5 h-5 border-2 border-primary/30 border-t-primary rounded-full animate-spin" />
-              ⏳ Génération en cours…
-            </div>
-          )}
-
-          {error && (
-            <div
-              className="mt-6 rounded-xl border border-destructive/30 bg-destructive/10 text-destructive px-4 py-3 text-sm"
-              role="alert"
-            >
-              {error}
-            </div>
-          )}
-
-          {result && !loading && (
-            <div className="mt-6 rounded-xl bg-muted border border-border px-4 py-4 text-sm leading-relaxed text-foreground whitespace-pre-line">
-              {result}
-            </div>
-          )}
+          </div>
         </div>
-      </section>
+      </div>
     </SiteLayout>
   );
 }

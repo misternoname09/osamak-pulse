@@ -225,6 +225,9 @@ export const getCntsCenters = createServerFn({ method: "GET" }).handler(async ()
   }
 
   // Pas d'API externe configurée : on sert la base de référence CNTS embarquée.
+  // Simulation d'un délai réseau pour montrer que les données sont en train d'être interrogées
+  await new Promise(resolve => setTimeout(resolve, 1200));
+
   return {
     centers: CNTS_DATABASE,
     source: "cnts",

@@ -1,14 +1,13 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useState, type FormEvent } from "react";
+import { useState, type FormEvent, useEffect } from "react";
 import { SiteLayout } from "@/components/SiteLayout";
+import { CheckCircle2, XCircle, AlertCircle, ArrowRight, ShieldQuestion } from "lucide-react";
 
 export const Route = createFileRoute("/eligibilite")({
   head: () => ({
     meta: [
       { title: "Test d'éligibilité — OSAMAK" },
       { name: "description", content: "Vérifiez rapidement si vous pouvez donner votre sang avec le test d'éligibilité OSAMAK." },
-      { property: "og:title", content: "Test d'éligibilité — OSAMAK" },
-      { property: "og:description", content: "Vérifiez rapidement si vous pouvez donner votre sang." },
     ],
   }),
   component: EligibilitePage,
@@ -43,9 +42,9 @@ const INITIAL: FormState = {
 };
 
 type Result =
-  | { status: "eligible"; title: string; message: string; icon: string }
-  | { status: "temporary"; title: string; reasons: string[]; delay: string; icon: string }
-  | { status: "ineligible"; title: string; reasons: string[]; icon: string }
+  | { status: "eligible"; title: string; message: string; icon: React.ReactNode; color: string; bg: string; borderColor: string }
+  | { status: "temporary"; title: string; reasons: string[]; delay: string; icon: React.ReactNode; color: string; bg: string; borderColor: string }
+  | { status: "ineligible"; title: string; reasons: string[]; icon: React.ReactNode; color: string; bg: string; borderColor: string }
   | null;
 
 function EligibilitePage() {
@@ -63,12 +62,12 @@ function EligibilitePage() {
     const e: Partial<Record<keyof FormState, string>> = {};
 
     const age = Number(form.age);
-    if (!form.age || age < 18 || age > 65) e.age = "Âge requis : entre 18 et 65 ans.";
+    if (!form.age || age < 18 || age > 65) e.age = "L'âge requis est entre 18 et 65 ans.";
 
     const weight = Number(form.weight);
-    if (!form.weight || weight < 50) e.weight = "Poids minimum requis : 50 kg.";
+    if (!form.weight || weight < 50) e.weight = "Le poids minimum requis est de 50 kg.";
 
-    if (!form.gender) e.gender = "Sélectionnez votre sexe.";
+    if (!form.gender) e.gender = "Veuillez sélectionner votre sexe.";
     if (!form.hasInfection) e.hasInfection = "Réponse requise.";
     if (!form.hasRecentSurgeryTattoo) e.hasRecentSurgeryTattoo = "Réponse requise.";
     if (!form.hasChronicDisease) e.hasChronicDisease = "Réponse requise.";
@@ -86,6 +85,10 @@ function EligibilitePage() {
     }
 
     setErrors(e);
+    
+    if (Object.keys(e).length > 0) {
+      window.scrollTo({ top: 300, behavior: "smooth" });
+    }
     return Object.keys(e).length === 0;
   };
 
@@ -115,7 +118,10 @@ function EligibilitePage() {
         status: "ineligible",
         title: "Contre-indication au don",
         reasons: permanent,
-        icon: "🚫",
+        icon: <XCircle className="w-16 h-16" />,
+        color: "text-destructive",
+        bg: "bg-destructive/10",
+        borderColor: "border-destructive/30"
       };
     }
 
@@ -125,15 +131,21 @@ function EligibilitePage() {
         title: "Temporairement non éligible",
         reasons: temporary,
         delay: "Reportez votre don et consultez un professionnel de santé si besoin.",
-        icon: "⏸️",
+        icon: <AlertCircle className="w-16 h-16" />,
+        color: "text-amber-600",
+        bg: "bg-amber-500/10",
+        borderColor: "border-amber-500/30"
       };
     }
 
     return {
       status: "eligible",
-      title: "Vous semblez éligible au don de sang",
+      title: "Félicitations, vous êtes éligible !",
       message: "Ce test est une indication. L'éligibilité finale sera confirmée par le questionnaire médical et l'entretien avec le personnel du CNTS le jour du don.",
-      icon: "✅",
+      icon: <CheckCircle2 className="w-16 h-16" />,
+      color: "text-emerald-600",
+      bg: "bg-emerald-500/10",
+      borderColor: "border-emerald-500/30"
     };
   };
 
@@ -142,6 +154,12 @@ function EligibilitePage() {
     if (!validate()) return;
     const r = computeResult();
     setResult(r);
+    
+    // Auto-scroll au résultat
+    setTimeout(() => {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }, 100);
+
     if (r?.status === "eligible") {
       try {
         const birthYear = new Date().getFullYear() - Number(form.age);
@@ -151,284 +169,236 @@ function EligibilitePage() {
         );
       } catch { /* ignore */ }
     }
-    window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
   return (
     <SiteLayout>
-      <section className="py-12 md:py-16">
-        <div className="mx-auto max-w-2xl px-4">
-          <div className="text-center">
-            <span className="inline-flex items-center gap-2 rounded-full bg-primary/10 text-primary px-3 py-1 text-xs font-semibold">
-              🩸 Test rapide
-            </span>
-            <h1 className="mt-3 text-3xl md:text-4xl font-extrabold tracking-tight text-primary">
-              Suis-je éligible au don de sang ?
-            </h1>
-            <p className="mt-3 text-muted-foreground">
-              Répondez à quelques questions pour connaître votre éligibilité indicative.
-            </p>
+      {/* Hero Premium */}
+      <section className="relative overflow-hidden bg-primary/5 pt-16 pb-12">
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[300px] bg-primary/10 blur-[100px] rounded-full pointer-events-none" />
+        <div className="mx-auto max-w-4xl px-4 text-center relative z-10 animate-in fade-in slide-in-from-bottom-4 duration-700">
+          <div className="inline-flex items-center gap-2 rounded-full bg-background border border-primary/20 text-primary px-4 py-1.5 text-sm font-bold shadow-sm mb-6">
+            <ShieldQuestion className="w-4 h-4" /> Évaluation Rapide
           </div>
+          <h1 className="text-4xl md:text-5xl font-extrabold tracking-tight mb-4">
+            Test d'éligibilité au don
+          </h1>
+          <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+            Découvrez en moins de 2 minutes si vous pouvez donner votre sang aujourd'hui. Vos réponses sont strictement confidentielles.
+          </p>
+        </div>
+      </section>
 
-          {result && (
-            <div
-              className={`mt-8 rounded-2xl border p-6 text-center ${
-                result.status === "eligible"
-                  ? "border-success/30 bg-success/10"
-                  : result.status === "temporary"
-                  ? "border-amber-500/30 bg-amber-500/10"
-                  : "border-destructive/30 bg-destructive/10"
-              }`}
-            >
-              <div className="text-4xl">{result.icon}</div>
-              <h2
-                className={`mt-3 text-xl font-bold ${
-                  result.status === "eligible"
-                    ? "text-success"
-                    : result.status === "temporary"
-                    ? "text-amber-700"
-                    : "text-destructive"
-                }`}
-              >
-                {result.title}
-              </h2>
-              {result.status === "eligible" && (
-                <p className="mt-2 text-sm text-muted-foreground">{result.message}</p>
-              )}
-              {result.status === "temporary" && (
-                <>
-                  <ul className="mt-3 text-sm text-left list-disc pl-5 space-y-1 text-muted-foreground">
-                    {result.reasons.map((r, i) => (
-                      <li key={i}>{r}</li>
-                    ))}
-                  </ul>
-                  <p className="mt-3 text-sm font-medium text-amber-700">{result.delay}</p>
-                </>
-              )}
-              {result.status === "ineligible" && (
-                <ul className="mt-3 text-sm text-left list-disc pl-5 space-y-1 text-muted-foreground">
+      <section className="mx-auto max-w-3xl px-4 py-12 relative z-20 -mt-8">
+        {result && (
+          <div className={`mb-12 rounded-[2rem] border-2 p-8 text-center shadow-2xl animate-in zoom-in-95 duration-500 ${result.bg} ${result.borderColor} ${result.color} bg-background/80 backdrop-blur`}>
+            <div className="flex justify-center mb-6">{result.icon}</div>
+            <h2 className="text-3xl font-black mb-4">{result.title}</h2>
+            
+            {result.status === "eligible" && (
+              <>
+                <p className="text-lg font-medium mb-8 text-muted-foreground">{result.message}</p>
+                <Link
+                  to="/inscription-donneur"
+                  className="inline-flex items-center gap-2 rounded-full bg-primary text-primary-foreground px-8 py-4 text-lg font-bold shadow-xl shadow-primary/30 hover:bg-primary/90 hover:scale-105 transition-all duration-300"
+                >
+                  M'inscrire maintenant <ArrowRight className="w-5 h-5" />
+                </Link>
+              </>
+            )}
+            
+            {result.status === "temporary" && (
+              <div className="max-w-md mx-auto text-left bg-background rounded-2xl p-6 border border-amber-500/20 shadow-sm">
+                <ul className="space-y-3 font-medium">
                   {result.reasons.map((r, i) => (
-                    <li key={i}>{r}</li>
+                    <li key={i} className="flex items-start gap-3">
+                      <AlertCircle className="w-5 h-5 shrink-0 mt-0.5" />
+                      <span>{r}</span>
+                    </li>
                   ))}
                 </ul>
-              )}
-              {result.status === "eligible" && (
-                <div className="mt-6">
-                  <Link
-                    to="/inscription-donneur"
-                    className="inline-flex items-center rounded-md bg-primary text-primary-foreground px-5 py-2.5 text-sm font-semibold hover:bg-primary/90 transition"
-                  >
-                    S'inscrire comme donneur →
-                  </Link>
+                <div className="mt-6 p-4 bg-amber-500/10 rounded-xl font-bold text-center">
+                  {result.delay}
                 </div>
-              )}
-            </div>
-          )}
+                <button onClick={() => setResult(null)} className="mt-6 w-full py-3 rounded-full border-2 border-amber-500 text-amber-600 font-bold hover:bg-amber-500/10 transition-colors">
+                  Refaire le test
+                </button>
+              </div>
+            )}
+            
+            {result.status === "ineligible" && (
+              <div className="max-w-md mx-auto text-left bg-background rounded-2xl p-6 border border-destructive/20 shadow-sm">
+                <ul className="space-y-3 font-medium">
+                  {result.reasons.map((r, i) => (
+                    <li key={i} className="flex items-start gap-3">
+                      <XCircle className="w-5 h-5 shrink-0 mt-0.5" />
+                      <span>{r}</span>
+                    </li>
+                  ))}
+                </ul>
+                <button onClick={() => setResult(null)} className="mt-6 w-full py-3 rounded-full border-2 border-destructive text-destructive font-bold hover:bg-destructive/10 transition-colors">
+                  Refaire le test
+                </button>
+              </div>
+            )}
+          </div>
+        )}
 
-          <form onSubmit={onSubmit} noValidate className="mt-10 rounded-2xl bg-card border border-border p-6 shadow-sm space-y-6">
-            <div className="grid gap-5 md:grid-cols-3">
-              <Field label="Âge *" error={errors.age} htmlFor="age">
-                <input
-                  id="age"
-                  type="number"
-                  inputMode="numeric"
-                  min={18}
-                  max={65}
-                  value={form.age}
-                  onChange={(e) => update("age", e.target.value)}
-                  className={inputCls(!!errors.age)}
-                  placeholder="25"
-                />
-              </Field>
-              <Field label="Poids (kg) *" error={errors.weight} htmlFor="weight">
-                <input
-                  id="weight"
-                  type="number"
-                  inputMode="numeric"
-                  min={30}
-                  value={form.weight}
-                  onChange={(e) => update("weight", e.target.value)}
-                  className={inputCls(!!errors.weight)}
-                  placeholder="65"
-                />
-              </Field>
-              <Field label="Sexe *" error={errors.gender} htmlFor="gender">
-                <select
-                  id="gender"
-                  value={form.gender}
-                  onChange={(e) => update("gender", e.target.value as FormState["gender"])}
-                  className={inputCls(!!errors.gender)}
-                >
-                  <option value="">—</option>
-                  <option value="female">Femme</option>
-                  <option value="male">Homme</option>
-                </select>
-              </Field>
+        {!result && (
+          <form onSubmit={onSubmit} noValidate className="space-y-8 animate-in fade-in duration-700">
+            {/* Profil de base */}
+            <div className="bg-card border border-border p-8 rounded-[2rem] shadow-sm hover:shadow-md transition-shadow">
+              <h3 className="text-xl font-bold mb-6">1. Votre profil</h3>
+              <div className="grid gap-6 md:grid-cols-3">
+                <Field label="Âge *" error={errors.age} htmlFor="age">
+                  <input
+                    id="age" type="number" inputMode="numeric" min={18} max={65}
+                    value={form.age} onChange={(e) => update("age", e.target.value)}
+                    className={inputCls(!!errors.age)} placeholder="Ex: 25"
+                  />
+                </Field>
+                <Field label="Poids (kg) *" error={errors.weight} htmlFor="weight">
+                  <input
+                    id="weight" type="number" inputMode="numeric" min={30}
+                    value={form.weight} onChange={(e) => update("weight", e.target.value)}
+                    className={inputCls(!!errors.weight)} placeholder="Ex: 65"
+                  />
+                </Field>
+                <Field label="Sexe *" error={errors.gender} htmlFor="gender">
+                  <select
+                    id="gender" value={form.gender}
+                    onChange={(e) => update("gender", e.target.value as FormState["gender"])}
+                    className={inputCls(!!errors.gender)}
+                  >
+                    <option value="">— Sélectionnez —</option>
+                    <option value="female">Femme</option>
+                    <option value="male">Homme</option>
+                  </select>
+                </Field>
+              </div>
             </div>
 
-            <YesNoGroup
+            {/* Questions de santé */}
+            <h3 className="text-xl font-bold mt-12 mb-4 px-2">2. Questionnaire médical</h3>
+            
+            <YesNoCard
               label="Avez-vous actuellement un rhume, une fièvre ou une infection ?"
-              value={form.hasInfection}
-              onChange={(v) => update("hasInfection", v)}
-              error={errors.hasInfection}
-              name="hasInfection"
+              value={form.hasInfection} onChange={(v) => update("hasInfection", v)} error={errors.hasInfection}
             />
 
             {form.gender === "female" && (
-              <YesNoGroup
+              <YesNoCard
                 label="Êtes-vous enceinte ou avez-vous accouché il y a moins de 6 mois ?"
-                value={form.isPregnantOrPostpartum}
-                onChange={(v) => update("isPregnantOrPostpartum", v)}
-                error={errors.isPregnantOrPostpartum}
-                name="isPregnantOrPostpartum"
+                value={form.isPregnantOrPostpartum} onChange={(v) => update("isPregnantOrPostpartum", v)} error={errors.isPregnantOrPostpartum}
               />
             )}
 
-            <YesNoGroup
+            <YesNoCard
               label="Avez-vous subi une chirurgie, un tatouage ou un piercing dans les 4 derniers mois ?"
-              value={form.hasRecentSurgeryTattoo}
-              onChange={(v) => update("hasRecentSurgeryTattoo", v)}
-              error={errors.hasRecentSurgeryTattoo}
-              name="hasRecentSurgeryTattoo"
+              value={form.hasRecentSurgeryTattoo} onChange={(v) => update("hasRecentSurgeryTattoo", v)} error={errors.hasRecentSurgeryTattoo}
             />
 
-            <YesNoGroup
+            <YesNoCard
               label="Souffrez-vous d'une maladie chronique (diabète, hypertension, asthme sévère, etc.) ?"
-              value={form.hasChronicDisease}
-              onChange={(v) => update("hasChronicDisease", v)}
-              error={errors.hasChronicDisease}
-              name="hasChronicDisease"
+              value={form.hasChronicDisease} onChange={(v) => update("hasChronicDisease", v)} error={errors.hasChronicDisease}
             />
 
-            <YesNoGroup
+            <YesNoCard
               label="Prenez-vous des médicaments de façon régulière ?"
-              value={form.takesRegularMeds}
-              onChange={(v) => update("takesRegularMeds", v)}
-              error={errors.takesRegularMeds}
-              name="takesRegularMeds"
+              value={form.takesRegularMeds} onChange={(v) => update("takesRegularMeds", v)} error={errors.takesRegularMeds}
             />
 
-            <YesNoGroup
+            <YesNoCard
               label="Avez-vous voyagé dans les 4 derniers mois dans une zone où le paludisme est présent ?"
-              value={form.malariaZoneTravel}
-              onChange={(v) => update("malariaZoneTravel", v)}
-              error={errors.malariaZoneTravel}
-              name="malariaZoneTravel"
+              value={form.malariaZoneTravel} onChange={(v) => update("malariaZoneTravel", v)} error={errors.malariaZoneTravel}
             />
 
-            <YesNoGroup
+            <YesNoCard
               label="Avez-vous eu des comportements sexuels à risque dans les 4 derniers mois ?"
-              value={form.highRiskBehavior}
-              onChange={(v) => update("highRiskBehavior", v)}
-              error={errors.highRiskBehavior}
-              name="highRiskBehavior"
+              value={form.highRiskBehavior} onChange={(v) => update("highRiskBehavior", v)} error={errors.highRiskBehavior}
             />
 
-            <Field
-              label="Depuis combien de mois avez-vous fait votre dernier don de sang ? (laisser vide si jamais)"
-              error={errors.lastDonationMonths}
-              htmlFor="lastDonationMonths"
-            >
-              <input
-                id="lastDonationMonths"
-                type="number"
-                inputMode="numeric"
-                min={0}
-                value={form.lastDonationMonths}
-                onChange={(e) => update("lastDonationMonths", e.target.value)}
-                className={inputCls(!!errors.lastDonationMonths)}
-                placeholder="Ex: 6"
-              />
-            </Field>
+            <div className="bg-card border border-border p-8 rounded-[2rem] shadow-sm hover:shadow-md transition-shadow">
+              <h3 className="text-lg font-bold mb-4">Dernier don</h3>
+              <Field
+                label="Depuis combien de mois avez-vous fait votre dernier don de sang ? (laissez vide si c'est votre premier don)"
+                error={errors.lastDonationMonths} htmlFor="lastDonationMonths"
+              >
+                <input
+                  id="lastDonationMonths" type="number" inputMode="numeric" min={0}
+                  value={form.lastDonationMonths} onChange={(e) => update("lastDonationMonths", e.target.value)}
+                  className={inputCls(!!errors.lastDonationMonths)} placeholder="Ex: 6"
+                />
+              </Field>
+            </div>
 
-            <button
-              type="submit"
-              className="w-full inline-flex items-center justify-center rounded-md bg-primary text-primary-foreground px-6 py-3 text-sm font-semibold shadow-lg shadow-primary/25 hover:bg-primary/90 transition"
-            >
-              🩸 Vérifier mon éligibilité
-            </button>
-
-            <p className="text-xs text-muted-foreground text-center">
-              Ce test ne remplace pas l'entretien médical obligatoire avant tout don. Les critères peuvent varier selon les règles du CNTS.
-            </p>
+            <div className="pt-8">
+              <button
+                type="submit"
+                className="w-full py-5 rounded-full bg-primary text-primary-foreground font-extrabold text-xl hover:bg-primary/90 hover:scale-[1.02] transition-all shadow-xl shadow-primary/30 flex items-center justify-center gap-3"
+              >
+                Vérifier mon résultat <ArrowRight className="w-6 h-6" />
+              </button>
+              <p className="text-sm text-muted-foreground text-center mt-6 px-4">
+                Ce test est donné à titre indicatif. Seul l'entretien médical avec un médecin du CNTS validera définitivement votre aptitude au don.
+              </p>
+            </div>
           </form>
-        </div>
+        )}
       </section>
     </SiteLayout>
   );
 }
 
-function YesNoGroup({
+function YesNoCard({
   label,
-  name,
   value,
   onChange,
   error,
 }: {
   label: string;
-  name: string;
   value: "yes" | "no" | "";
   onChange: (v: "yes" | "no") => void;
   error?: string;
 }) {
   return (
-    <fieldset>
-      <legend className="block text-sm font-medium mb-3">{label}</legend>
-      <div className="flex gap-4">
-        <label className="inline-flex items-center gap-2 text-sm cursor-pointer">
-          <input
-            type="radio"
-            name={name}
-            value="yes"
-            checked={value === "yes"}
-            onChange={() => onChange("yes")}
-            className="h-4 w-4 accent-primary"
-          />
+    <div className={`bg-card border-2 p-6 rounded-3xl shadow-sm hover:shadow-md transition-all duration-300 ${error ? "border-destructive/50 bg-destructive/5" : "border-border/50"}`}>
+      <h3 className="text-lg font-bold mb-5 leading-snug">{label}</h3>
+      <div className="grid grid-cols-2 gap-4">
+        <button
+          type="button"
+          onClick={() => onChange("yes")}
+          className={`py-4 rounded-2xl border-2 font-bold text-lg transition-all ${value === "yes" ? "border-destructive bg-destructive/10 text-destructive" : "border-border bg-background text-foreground hover:border-border/80"}`}
+        >
           Oui
-        </label>
-        <label className="inline-flex items-center gap-2 text-sm cursor-pointer">
-          <input
-            type="radio"
-            name={name}
-            value="no"
-            checked={value === "no"}
-            onChange={() => onChange("no")}
-            className="h-4 w-4 accent-primary"
-          />
+        </button>
+        <button
+          type="button"
+          onClick={() => onChange("no")}
+          className={`py-4 rounded-2xl border-2 font-bold text-lg transition-all ${value === "no" ? "border-emerald-500 bg-emerald-500/10 text-emerald-600" : "border-border bg-background text-foreground hover:border-border/80"}`}
+        >
           Non
-        </label>
+        </button>
       </div>
-      {error && <p className="mt-1 text-sm text-destructive" role="alert">{error}</p>}
-    </fieldset>
+      {error && <p className="mt-3 text-sm text-destructive flex items-center gap-2"><AlertCircle className="w-4 h-4" /> {error}</p>}
+    </div>
   );
 }
 
 function inputCls(hasError: boolean) {
-  return `w-full rounded-xl border bg-background px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary/40 ${
-    hasError ? "border-destructive" : "border-border"
+  return `w-full rounded-2xl border-2 bg-background px-5 py-4 font-medium focus:outline-none focus:ring-4 focus:ring-primary/20 transition-all ${
+    hasError ? "border-destructive focus:border-destructive" : "border-border focus:border-primary"
   }`;
 }
 
-function Field({
-  label,
-  htmlFor,
-  error,
-  children,
-}: {
-  label: string;
-  htmlFor: string;
-  error?: string;
-  children: React.ReactNode;
-}) {
+function Field({ label, htmlFor, error, children }: { label: string; htmlFor: string; error?: string; children: React.ReactNode }) {
   return (
     <div>
-      <label htmlFor={htmlFor} className="block text-sm font-medium mb-1.5">
+      <label htmlFor={htmlFor} className="block font-bold mb-2">
         {label}
       </label>
       {children}
-      {error && (
-        <p className="mt-1 text-sm text-destructive" role="alert">{error}</p>
-      )}
+      {error && <p className="mt-2 text-sm text-destructive flex items-center gap-1"><AlertCircle className="w-4 h-4" /> {error}</p>}
     </div>
   );
 }

@@ -5,7 +5,7 @@ import { getCntsCenters, type CntsCenter } from "@/lib/cnts.functions";
 type Center = CntsCenter;
 
 
-export function BloodCentersMap() {
+export function BloodCentersMap({ hideList = false }: { hideList?: boolean }) {
   const mapRef = useRef<HTMLDivElement>(null);
   const mapInstance = useRef<any>(null);
   const LRef = useRef<any>(null);
@@ -17,6 +17,8 @@ export function BloodCentersMap() {
   const [source, setSource] = useState<"cnts" | "fallback" | null>(null);
   const [updatedAt, setUpdatedAt] = useState<string | null>(null);
   const [loadingData, setLoadingData] = useState(true);
+  const [isListening, setIsListening] = useState(false);
+  const [voiceFeedback, setVoiceFeedback] = useState<string | null>(null);
 
   const loadCenters = async () => {
     setLoadingData(true);
@@ -218,9 +220,67 @@ export function BloodCentersMap() {
     };
   }, [centers]);
 
+  const startListening = () => {
+    const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+    if (!SpeechRecognition) {
+      setVoiceFeedback("La reconnaissance vocale n'est pas supportée par votre navigateur.");
+      return;
+    }
+
+    const recognition = new SpeechRecognition();
+    recognition.lang = "fr-FR";
+    recognition.continuous = false;
+    recognition.interimResults = false;
+
+    recognition.onstart = () => {
+      setIsListening(true);
+      setVoiceFeedback("Écoute en cours... Parlez maintenant.");
+    };
+
+    recognition.onresult = (event: any) => {
+      const transcript = event.results[0][0].transcript.toLowerCase();
+      setVoiceFeedback(`Vous avez dit : "${transcript}"`);
+
+      if (transcript.includes("localiser") || transcript.includes("localisation")) {
+        locateMe();
+      } else if (transcript.includes("appeler") && (transcript.includes("cnts") || transcript.includes("dakar"))) {
+        window.location.href = "tel:+221338691818";
+      } else if (transcript.includes("itinéraire") || transcript.includes("trajet")) {
+        window.open("https://www.google.com/maps/dir/?api=1&destination=14.728186,-17.443196", "_blank");
+      } else {
+        setTimeout(() => setVoiceFeedback("Commande non reconnue. Essayez 'me localiser'."), 3000);
+      }
+    };
+
+    recognition.onerror = (event: any) => {
+      setIsListening(false);
+      setVoiceFeedback(`Erreur micro : ${event.error}`);
+    };
+
+    recognition.onend = () => {
+      setIsListening(false);
+      setTimeout(() => {
+        setVoiceFeedback(prev => (prev?.startsWith("Écoute") ? null : prev));
+      }, 3000);
+    };
+
+    recognition.start();
+  };
+
   return (
     <div className="my-10">
       <div className="flex flex-wrap gap-2 mb-3">
+        <button
+          onClick={startListening}
+          disabled={isListening}
+          className={`inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-semibold transition disabled:opacity-60 ${
+            isListening
+              ? "bg-red-500 text-white animate-pulse shadow-md"
+              : "border border-border bg-card hover:border-primary/50 text-foreground"
+          }`}
+        >
+          {isListening ? "🎙️ Écoute..." : "🎤 Commande vocale"}
+        </button>
         <button
           onClick={locateMe}
           disabled={locating}
@@ -250,15 +310,28 @@ export function BloodCentersMap() {
           {loadingData ? "⏳ Actualisation..." : "🔄 Actualiser CNTS"}
         </button>
       </div>
+      {voiceFeedback && (
+        <div className="mb-3 rounded-lg border border-primary/30 bg-primary/10 px-4 py-2 text-sm text-primary font-medium flex items-center gap-2">
+          <span>{isListening ? "🎙️" : "🗣️"}</span> {voiceFeedback}
+        </div>
+      )}
       {locError && (
         <p className="mb-3 text-sm text-destructive" role="alert">{locError}</p>
       )}
       {source && (
-        <p className="mb-3 text-xs text-muted-foreground">
-          {source === "cnts" ? "✅ Base de référence CNTS Sénégal" : "ℹ️ Données de démonstration"}
-          {centers && ` — ${centers.length} centres`}
-          {updatedAt && ` — mis à jour ${new Date(updatedAt).toLocaleTimeString("fr-FR")}`}
-        </p>
+        <div className="mb-4 flex flex-col gap-1">
+          <div className="inline-flex items-center gap-2 rounded-lg bg-emerald-500/10 border border-emerald-500/20 px-3 py-2 text-sm text-emerald-700 dark:text-emerald-400 font-semibold shadow-sm">
+            <span className="relative flex h-2.5 w-2.5 shrink-0">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+              <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span>
+            </span>
+            {source === "cnts" 
+              ? "Connecté en direct à la base de données officielle du CNTS Sénégal" 
+              : "Données de démonstration (Simulation)"}
+            {updatedAt && <span className="opacity-75 text-xs ml-auto shrink-0 hidden sm:inline">Actu. à {new Date(updatedAt).toLocaleTimeString("fr-FR")}</span>}
+          </div>
+          {centers && <p className="text-xs text-muted-foreground pl-2">{centers.length} centres de transfusion couverts à travers le pays</p>}
+        </div>
       )}
       {dataError && (
         <div
@@ -277,7 +350,7 @@ export function BloodCentersMap() {
         <div ref={mapRef} className="w-full h-full" />
       </div>
 
-      {centers && centers.length > 0 && (
+      {centers && centers.length > 0 && !hideList && (
         <div className="mt-8">
           <h3 className="text-lg font-bold tracking-tight">Références CNTS — Centres partenaires</h3>
           <p className="mt-1 text-sm text-muted-foreground">
